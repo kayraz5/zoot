@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { PAGE_W, PAGE_H } from './pageArt.js'
+import { DEFAULT_COVER } from '../lib/brand.js'
 
 /**
  * 3D flip passport (Shrey's set piece).
@@ -18,7 +19,7 @@ export class PassportBook {
    * @param {HTMLCanvasElement} canvas
    * @param {{pageCount:number, paint:(i:number, ctx:CanvasRenderingContext2D)=>void, coverColor:string}} opts
    */
-  constructor(canvas, { pageCount, paint, coverColor = '#0e6f69' }) {
+  constructor(canvas, { pageCount, paint, coverColor = DEFAULT_COVER }) {
     this.canvas = canvas
     this.paint = paint
     this.pageCount = pageCount
@@ -35,7 +36,7 @@ export class PassportBook {
     this.scene = new THREE.Scene()
     this.camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50)
 
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xd9c9a8, 2.1))
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xffe9a0, 2.1))
     const sun = new THREE.DirectionalLight(0xffffff, 1.6)
     sun.position.set(-1.5, 4, 2.5)
     this.scene.add(sun)
@@ -116,7 +117,7 @@ export class PassportBook {
     const fp = this.pages[i * 2]
     const bp = this.pages[i * 2 + 1]
     const frontMesh = new THREE.Mesh(front, new THREE.MeshStandardMaterial({ map: fp.texture, roughness: 0.92, side: THREE.FrontSide }))
-    const backMesh = new THREE.Mesh(back, new THREE.MeshStandardMaterial({ map: bp?.texture || null, color: bp ? 0xffffff : 0xf3ecdb, roughness: 0.92, side: THREE.BackSide }))
+    const backMesh = new THREE.Mesh(back, new THREE.MeshStandardMaterial({ map: bp?.texture || null, color: bp ? 0xffffff : 0xfff8dc, roughness: 0.92, side: THREE.BackSide }))
     frontMesh.frustumCulled = backMesh.frustumCulled = false
     this.scene.add(frontMesh, backMesh)
     return { i, front, frontMesh, backMesh, p: 0, target: 0, delay: 0, dirty: true }
@@ -149,14 +150,14 @@ export class PassportBook {
 
   makeStampTool() {
     const g = new THREE.Group()
-    const wood = new THREE.MeshStandardMaterial({ color: 0x9c6b3f, roughness: 0.7 })
+    const wood = new THREE.MeshStandardMaterial({ color: 0xffcc00, roughness: 0.6 }) // yellow handle, ink block
     const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.065, 0.32, 12), wood)
     handle.position.y = 0.26
     const knob = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 12), wood)
     knob.position.y = 0.45
-    const block = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.09, 24), new THREE.MeshStandardMaterial({ color: 0x3b3b3b, roughness: 0.5 }))
+    const block = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.09, 24), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 }))
     block.position.y = 0.07
-    this.toolInk = new THREE.MeshStandardMaterial({ color: 0xc0392b, roughness: 0.4 })
+    this.toolInk = new THREE.MeshStandardMaterial({ color: 0xf83878, roughness: 0.4 })
     const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.025, 24), this.toolInk)
     pad.position.y = 0.012
     g.add(handle, knob, block, pad)

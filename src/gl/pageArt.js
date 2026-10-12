@@ -1,9 +1,27 @@
+import { BRAND, DEFAULT_COVER, onColor } from '../lib/brand.js'
+
 /**
  * Canvas painters for passport pages (Shrey's lane). Each returns nothing and
- * paints into a 512×716 canvas that becomes a Three.js texture.
+ * paints into a 512×716 canvas that becomes a Three.js texture. Colours follow
+ * the Zoot deck: yellow cover with an ink globe, cream pages, ink and pink chops.
  */
 export const PAGE_W = 512
 export const PAGE_H = 716
+const INK = BRAND.ink
+const MUTED = '#8a7f5a'
+
+/** Re-colour a single-colour image (the otter) by drawing it through a tinted mask. */
+function tinted(img, color) {
+  const c = document.createElement('canvas')
+  c.width = img.naturalWidth || img.width
+  c.height = img.naturalHeight || img.height
+  const x = c.getContext('2d')
+  x.drawImage(img, 0, 0)
+  x.globalCompositeOperation = 'source-in'
+  x.fillStyle = color
+  x.fillRect(0, 0, c.width, c.height)
+  return c
+}
 
 function rand(seed) {
   let s = [...String(seed)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7)
@@ -11,13 +29,13 @@ function rand(seed) {
 }
 
 /** Paper + guilloche. `left` pages have the spine on their right edge. */
-function paper(ctx, tint = '#fbf5e8', left = false) {
+function paper(ctx, tint = '#fffbea', left = false) {
   ctx.fillStyle = tint
   ctx.fillRect(0, 0, PAGE_W, PAGE_H)
   // Guilloche security pattern.
   ctx.save()
-  ctx.globalAlpha = 0.18
-  ctx.strokeStyle = '#7fb8b0'
+  ctx.globalAlpha = 0.3
+  ctx.strokeStyle = '#f2c200'
   ctx.lineWidth = 1
   for (let k = 0; k < 14; k++) {
     ctx.beginPath()
@@ -38,8 +56,8 @@ function paper(ctx, tint = '#fbf5e8', left = false) {
 }
 
 function pageNumber(ctx, n, left) {
-  ctx.fillStyle = '#9a8f7a'
-  ctx.font = '600 16px Nunito, sans-serif'
+  ctx.fillStyle = MUTED
+  ctx.font = '700 16px Poppins, sans-serif'
   ctx.textAlign = left ? 'left' : 'right'
   ctx.fillText(String(n), left ? 28 : PAGE_W - 28, PAGE_H - 24)
 }
@@ -83,91 +101,97 @@ export function drawChop(ctx, { x, y, r, ink, glyph, label, sub, seed, alpha = 0
   ctx.font = `700 ${Math.round(r * 0.72)}px Fredoka, serif`
   ctx.fillText(glyph, 0, -r * 0.12)
   if (label) {
-    ctx.font = `800 ${Math.max(9, Math.round(r * 0.2))}px Nunito, sans-serif`
+    ctx.font = `800 ${Math.max(9, Math.round(r * 0.2))}px Poppins, sans-serif`
     ctx.fillText(label.toUpperCase().slice(0, 16), 0, r * 0.45)
   }
   if (sub) {
-    ctx.font = `700 ${Math.max(8, Math.round(r * 0.16))}px Nunito, sans-serif`
+    ctx.font = `700 ${Math.max(8, Math.round(r * 0.16))}px Poppins, sans-serif`
     ctx.fillText(sub, 0, r * 0.66)
   }
   ctx.restore()
   speckle(ctx, x, y, r * 1.05, seed)
 }
 
-export function drawCover(ctx, { color = '#0e6f69', name = 'Field Traveller' }) {
+export function drawCover(ctx, { color = DEFAULT_COVER, name = 'Field Traveller', otter = null }) {
+  const foil = onColor(color)
   ctx.fillStyle = color
   ctx.fillRect(0, 0, PAGE_W, PAGE_H)
-  // Leather grain.
+  // Soft grain so the cover reads as card stock, not a flat fill.
   const rnd = rand(color)
-  ctx.globalAlpha = 0.08
-  for (let i = 0; i < 2500; i++) {
+  ctx.globalAlpha = 0.05
+  for (let i = 0; i < 2200; i++) {
     ctx.fillStyle = rnd() > 0.5 ? '#000' : '#fff'
     ctx.fillRect(rnd() * PAGE_W, rnd() * PAGE_H, 2, 2)
   }
   ctx.globalAlpha = 1
-  const gold = ctx.createLinearGradient(0, 200, 0, 480)
-  gold.addColorStop(0, '#ffe6a3')
-  gold.addColorStop(0.5, '#d9a93b')
-  gold.addColorStop(1, '#f7d27a')
-  ctx.fillStyle = gold
-  ctx.strokeStyle = gold
+  ctx.fillStyle = foil
+  ctx.strokeStyle = foil
   ctx.textAlign = 'center'
-  ctx.font = '700 44px Fredoka, sans-serif'
-  ctx.fillText('LAYQUEST', PAGE_W / 2, 150)
-  ctx.font = '800 20px Nunito, sans-serif'
-  ctx.fillText('TRAVELLER PASSPORT', PAGE_W / 2, 186)
-  // Emblem: compass rose in a ring.
-  ctx.lineWidth = 6
-  ctx.beginPath()
-  ctx.arc(PAGE_W / 2, 360, 92, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  ctx.arc(PAGE_W / 2, 360, 76, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.save()
-  ctx.translate(PAGE_W / 2, 360)
-  for (let i = 0; i < 4; i++) {
-    ctx.rotate(Math.PI / 2)
-    ctx.beginPath()
-    ctx.moveTo(0, -64)
-    ctx.lineTo(14, 0)
-    ctx.lineTo(-14, 0)
-    ctx.closePath()
-    ctx.fill()
+  // Wordmark: the leaping otter over lowercase "zoot".
+  if (otter) {
+    const w = 150
+    const h = (w * (otter.naturalHeight || otter.height)) / (otter.naturalWidth || otter.width)
+    ctx.drawImage(tinted(otter, foil), PAGE_W / 2 - w / 2 - 6, 62, w, h)
   }
-  ctx.restore()
-  ctx.font = '800 18px Nunito, sans-serif'
-  ctx.fillText(name.toUpperCase().slice(0, 24), PAGE_W / 2, 560)
-  ctx.font = '700 14px Nunito, sans-serif'
-  ctx.fillText('YOUR LAYOVER, ALREADY QUESTED', PAGE_W / 2, 600)
+  ctx.font = '700 104px Fredoka, sans-serif'
+  ctx.fillText('zoot', PAGE_W / 2, 214)
+  ctx.font = '800 19px Poppins, sans-serif'
+  ctx.fillText('P A S S P O R T', PAGE_W / 2, 254)
+
+  // Globe emblem, as on the passport in the pitch deck.
+  const cx = PAGE_W / 2
+  const cy = 408
+  const r = 96
+  ctx.lineWidth = 7
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke()
+  ctx.lineWidth = 5
+  ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.stroke()
+  ctx.beginPath(); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke()
+  for (const k of [0.45, 0.82]) {
+    ctx.beginPath(); ctx.ellipse(cx, cy, r * k, r, 0, 0, Math.PI * 2); ctx.stroke()
+  }
+  for (const dy of [-0.5, 0.5]) {
+    const hw = Math.sqrt(1 - dy * dy) * r
+    ctx.beginPath(); ctx.moveTo(cx - hw, cy + dy * r); ctx.lineTo(cx + hw, cy + dy * r); ctx.stroke()
+  }
+
+  ctx.font = '800 20px Poppins, sans-serif'
+  ctx.fillText(name.toUpperCase().slice(0, 24), PAGE_W / 2, 572)
+  ctx.font = '700 15px Fredoka, sans-serif'
+  ctx.fillText('SHORT LAYOVER, JUST ZOOT!', PAGE_W / 2, 604)
   // Chip symbol.
-  ctx.lineWidth = 3
+  ctx.lineWidth = 4
   ctx.strokeRect(PAGE_W / 2 - 22, 636, 44, 30)
-  ctx.beginPath()
-  ctx.arc(PAGE_W / 2, 651, 8, 0, Math.PI * 2)
-  ctx.stroke()
+  ctx.beginPath(); ctx.arc(PAGE_W / 2, 651, 8, 0, Math.PI * 2); ctx.stroke()
+  // Outline, so a white or cream cover still has an edge.
+  ctx.lineWidth = 10
+  ctx.strokeStyle = INK
+  ctx.strokeRect(5, 5, PAGE_W - 10, PAGE_H - 10)
 }
 
 export function drawIdentity(ctx, { name, style, level, title, xp, stamps, chops, color }) {
-  paper(ctx, '#f6f0e1', true)
-  ctx.fillStyle = '#6b5f48'
+  paper(ctx, '#fff8dc', true)
+  ctx.fillStyle = INK
   ctx.textAlign = 'left'
-  ctx.font = '800 15px Nunito, sans-serif'
+  ctx.font = '800 15px Poppins, sans-serif'
   ctx.fillText('IDENTITY · TRAVELLER DATA', 44, 64)
   // Photo box.
-  ctx.fillStyle = color || '#0e6f69'
+  const photo = color || DEFAULT_COVER
+  ctx.fillStyle = photo
   ctx.fillRect(44, 96, 150, 190)
-  ctx.fillStyle = '#ffffffcc'
+  ctx.fillStyle = onColor(photo)
   ctx.beginPath()
   ctx.arc(119, 170, 38, 0, Math.PI * 2)
   ctx.fill()
   ctx.fillRect(74, 216, 90, 70)
+  ctx.lineWidth = 5
+  ctx.strokeStyle = INK
+  ctx.strokeRect(44, 96, 150, 190)
   const field = (label, value, y) => {
-    ctx.fillStyle = '#9a8f7a'
-    ctx.font = '700 12px Nunito, sans-serif'
+    ctx.fillStyle = MUTED
+    ctx.font = '700 12px Poppins, sans-serif'
     ctx.fillText(label, 216, y)
-    ctx.fillStyle = '#2a2a2a'
+    ctx.fillStyle = INK
     ctx.font = '700 22px Fredoka, sans-serif'
     ctx.fillText(String(value).slice(0, 18), 216, y + 26)
   }
@@ -175,32 +199,32 @@ export function drawIdentity(ctx, { name, style, level, title, xp, stamps, chops
   field('TRAVEL STYLE', style, 170)
   field('RANK', `L${level} ${title}`, 230)
   field('EXPERIENCE', `${xp} XP`, 290)
-  ctx.fillStyle = '#9a8f7a'
-  ctx.font = '700 12px Nunito, sans-serif'
+  ctx.fillStyle = MUTED
+  ctx.font = '700 12px Poppins, sans-serif'
   ctx.fillText('ISSUED AT', 44, 330)
   ctx.fillText('STAMPS', 216, 330)
   ctx.fillText('CHOPS', 360, 330)
-  ctx.fillStyle = '#2a2a2a'
+  ctx.fillStyle = INK
   ctx.font = '700 22px Fredoka, sans-serif'
   ctx.fillText('SINGAPORE', 44, 356)
   ctx.fillText(String(stamps), 216, 356)
   ctx.fillText(String(chops), 360, 356)
   // Signature squiggle.
-  ctx.strokeStyle = '#2f4f8f'
-  ctx.lineWidth = 2
+  ctx.strokeStyle = BRAND.pink
+  ctx.lineWidth = 3
   ctx.beginPath()
   for (let x = 44; x < 260; x += 4) ctx.lineTo(x, 420 + Math.sin(x / 9) * 8 + Math.sin(x / 23) * 6)
   ctx.stroke()
-  ctx.fillStyle = '#9a8f7a'
-  ctx.font = '700 11px Nunito, sans-serif'
+  ctx.fillStyle = MUTED
+  ctx.font = '700 11px Poppins, sans-serif'
   ctx.fillText('HOLDER SIGNATURE', 44, 450)
   // Machine-readable zone.
-  ctx.fillStyle = '#e9e1cd'
+  ctx.fillStyle = BRAND.yellow
   ctx.fillRect(0, PAGE_H - 150, PAGE_W, 110)
-  ctx.fillStyle = '#3a3a3a'
+  ctx.fillStyle = INK
   ctx.font = '600 21px "Courier New", monospace'
   const mrzName = (name || 'TRAVELLER').toUpperCase().replace(/[^A-Z]/g, '<').slice(0, 20)
-  ctx.fillText(`P<LQS${mrzName}`.padEnd(34, '<'), 30, PAGE_H - 110)
+  ctx.fillText(`P<ZOT${mrzName}`.padEnd(34, '<'), 30, PAGE_H - 110)
   ctx.fillText(`L${String(level).padStart(2, '0')}<<XP${String(xp).padStart(6, '0')}<<SIN<<CHANGI`.padEnd(34, '<'), 30, PAGE_H - 74)
   pageNumber(ctx, 1, true)
 }
@@ -210,17 +234,17 @@ export function drawIdentity(ctx, { name, style, level, title, xp, stamps, chops
  * opts.revealed=false hides the area chop so the 3D slam can reveal it.
  */
 export function drawAreaPage(ctx, { area, places, stampsByPlace, pageNo, left, revealed = true, inkProgress = 1 }) {
-  paper(ctx, '#fbf5e8', left)
-  ctx.fillStyle = '#6b5f48'
+  paper(ctx, '#fffbea', left)
+  ctx.fillStyle = MUTED
   ctx.textAlign = 'left'
-  ctx.font = '800 14px Nunito, sans-serif'
+  ctx.font = '800 14px Poppins, sans-serif'
   ctx.fillText('VISAS · ENTRIES · CHOPS', 44, 58)
-  ctx.fillStyle = area.ink
+  ctx.fillStyle = INK
   ctx.font = '700 38px Fredoka, sans-serif'
   ctx.fillText(area.id.toUpperCase(), 44, 104)
   const count = places.filter((p) => stampsByPlace[p.id]).length
-  ctx.fillStyle = '#9a8f7a'
-  ctx.font = '700 15px Nunito, sans-serif'
+  ctx.fillStyle = MUTED
+  ctx.font = '700 15px Poppins, sans-serif'
   ctx.fillText(`${count} / ${places.length} stamped`, 44, 132)
 
   // Area chop (top-right). Drawn only once revealed by the slam.
@@ -230,7 +254,7 @@ export function drawAreaPage(ctx, { area, places, stampsByPlace, pageNo, left, r
   } else {
     ctx.save()
     ctx.setLineDash([6, 7])
-    ctx.strokeStyle = '#c9bea6'
+    ctx.strokeStyle = '#d9c36a'
     ctx.lineWidth = 3
     ctx.beginPath()
     ctx.arc(392, 104, 60, 0, Math.PI * 2)
@@ -251,50 +275,53 @@ export function drawAreaPage(ctx, { area, places, stampsByPlace, pageNo, left, r
     } else {
       ctx.save()
       ctx.setLineDash([4, 6])
-      ctx.strokeStyle = '#d3c8b0'
+      ctx.strokeStyle = '#e0cd7e'
       ctx.lineWidth = 2
       ctx.beginPath()
       ctx.arc(x, y, 40, 0, Math.PI * 2)
       ctx.stroke()
       ctx.restore()
-      ctx.fillStyle = '#b8ac92'
+      ctx.fillStyle = '#a89a66'
       ctx.textAlign = 'center'
-      ctx.font = '700 12px Nunito, sans-serif'
+      ctx.font = '600 12px Poppins, sans-serif'
       wrap(ctx, p.name, x, y - 6, 88, 14)
     }
   })
   if (places.length > 8) {
-    ctx.fillStyle = '#9a8f7a'
+    ctx.fillStyle = MUTED
     ctx.textAlign = 'right'
-    ctx.font = '700 13px Nunito, sans-serif'
+    ctx.font = '700 13px Poppins, sans-serif'
     ctx.fillText(`+${places.length - 8} more in the Codex`, PAGE_W - 40, PAGE_H - 56)
   }
   pageNumber(ctx, pageNo, left)
 }
 
 export function drawBackPage(ctx, { badges, left = true }) {
-  paper(ctx, '#f3ecdb', left)
-  ctx.fillStyle = '#6b5f48'
+  paper(ctx, '#fff8dc', left)
+  ctx.fillStyle = MUTED
   ctx.textAlign = 'left'
-  ctx.font = '800 14px Nunito, sans-serif'
+  ctx.font = '800 14px Poppins, sans-serif'
   ctx.fillText('ENDORSEMENTS · BADGES', 44, 58)
   badges.forEach((b, i) => {
     const y = 120 + i * 92
     ctx.globalAlpha = b.earned ? 1 : 0.35
-    ctx.fillStyle = b.earned ? '#ffd166' : '#d9d2c1'
+    ctx.fillStyle = b.earned ? BRAND.yellow : '#ece4c4'
     ctx.beginPath()
     ctx.arc(80, y, 30, 0, Math.PI * 2)
     ctx.fill()
-    ctx.fillStyle = '#3b2a00'
+    ctx.lineWidth = 4
+    ctx.strokeStyle = INK
+    ctx.stroke()
+    ctx.fillStyle = INK
     ctx.textAlign = 'center'
     ctx.font = '700 26px Fredoka, sans-serif'
     ctx.fillText(b.glyph, 80, y + 9)
     ctx.textAlign = 'left'
-    ctx.fillStyle = '#2a2a2a'
+    ctx.fillStyle = INK
     ctx.font = '700 20px Fredoka, sans-serif'
     ctx.fillText(b.title, 128, y - 4)
-    ctx.fillStyle = '#7d735f'
-    ctx.font = '600 13px Nunito, sans-serif'
+    ctx.fillStyle = MUTED
+    ctx.font = '500 13px Poppins, sans-serif'
     ctx.fillText(b.text, 128, y + 18)
     ctx.globalAlpha = 1
   })

@@ -7,6 +7,7 @@ import { catalog, loadCatalog } from '../lib/catalog.js'
 import { usePassportStore } from '../stores/passport.js'
 import { useUserStore } from '../stores/user.js'
 import { useMissionStore } from '../stores/mission.js'
+import { DEFAULT_COVER } from '../lib/brand.js'
 
 /** 3D flip passport with chop slams for newly stamped areas (Shrey's lane). */
 const passport = usePassportStore()
@@ -17,6 +18,16 @@ const spread = ref(0)
 const failed = ref(false)
 const busy = ref(false)
 let book = null
+let otter = null // brand mark for the cover, loaded once
+
+function loadOtter() {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => { otter = img; resolve() }
+    img.onerror = () => resolve() // the cover still draws without it
+    img.src = '/brand/zoot-otter.png'
+  })
+}
 let dragX = null
 
 const FIRST_AREA_PAGE = 2
@@ -48,7 +59,7 @@ const badges = computed(() => {
 function paint(i, ctx) {
   const left = i % 2 === 1
   const p = user.profile || {}
-  if (i === 0) return drawCover(ctx, { color: p.cover_color, name: p.display_name })
+  if (i === 0) return drawCover(ctx, { color: p.cover_color || DEFAULT_COVER, name: p.display_name || 'Field Traveller', otter })
   if (i === 1) {
     return drawIdentity(ctx, {
       name: p.display_name || 'Field Traveller', style: STYLES[p.style]?.label || '—', level: user.level.level,
@@ -101,10 +112,10 @@ async function go(k) {
 onMounted(async () => {
   await loadCatalog()
   try {
-    await Promise.all([document.fonts.load('700 20px Fredoka'), document.fonts.load('800 20px Nunito')])
+    await Promise.all([document.fonts.load('700 20px Fredoka'), document.fonts.load('800 20px Poppins'), document.fonts.load('500 13px Poppins'), loadOtter()])
   } catch {}
   try {
-    book = new PassportBook(canvas.value, { pageCount, paint, coverColor: user.profile?.cover_color || '#0e6f69' })
+    book = new PassportBook(canvas.value, { pageCount, paint, coverColor: user.profile?.cover_color || DEFAULT_COVER })
   } catch (err) {
     console.warn('[passport] WebGL unavailable', err)
     failed.value = true
@@ -150,7 +161,7 @@ function savePage() {
   c.height = 716
   paint(idx, c.getContext('2d'))
   const a = document.createElement('a')
-  a.download = `layquest-passport-p${idx}.png`
+  a.download = `zoot-passport-p${idx}.png`
   a.href = c.toDataURL('image/png')
   a.click()
 }
@@ -159,10 +170,10 @@ const areaStats = computed(() => AREAS.map((a) => ({ ...a, n: (passport.byArea[a
 </script>
 
 <template>
-  <main class="lq-page">
+  <main class="zt-page">
     <div class="d-flex justify-content-between align-items-end mb-2">
       <div>
-        <h1 class="h3 mb-0">Passport</h1>
+        <h1 class="title mb-0">Passport</h1>
         <p class="text-muted small mb-0">{{ passport.stamps.length }} {{ passport.stamps.length === 1 ? 'stamp' : 'stamps' }} · {{ passport.chopCount }} area {{ passport.chopCount === 1 ? 'chop' : 'chops' }}</p>
       </div>
       <button class="btn btn-soft btn-sm" @click="savePage"><i class="bi bi-download"></i> Save page</button>
@@ -172,7 +183,7 @@ const areaStats = computed(() => AREAS.map((a) => ({ ...a, n: (passport.byArea[a
       <canvas v-if="!failed" ref="canvas" @pointerdown="onDown" @pointerup="onUp" aria-label="3D passport. Tap right side for next page, left for previous." role="img"></canvas>
       <div v-else class="fallback p-3">
         <p class="small text-muted">3D is unavailable on this device. Your chops:</p>
-        <div v-for="a in areaStats" :key="a.id" class="lq-pill me-1 mb-1" :style="{ color: a.ink }">{{ a.glyph }} {{ a.id }} ×{{ a.n }}</div>
+        <div v-for="a in areaStats" :key="a.id" class="zt-pill me-1 mb-1" :style="{ color: a.ink }">{{ a.glyph }} {{ a.id }} ×{{ a.n }}</div>
         <p v-if="!areaStats.length" class="small">No stamps yet.</p>
       </div>
     </div>
@@ -183,9 +194,9 @@ const areaStats = computed(() => AREAS.map((a) => ({ ...a, n: (passport.byArea[a
       <button class="btn btn-soft" :disabled="busy || spread >= Math.ceil(pageCount / 2)" @click="go(spread + 1)" aria-label="Next page"><i class="bi bi-chevron-right"></i></button>
     </div>
 
-    <div class="lq-section-title"><i class="bi bi-bookmark-star"></i> Jump to a page</div>
+    <div class="zt-section-title"><i class="bi bi-bookmark-star"></i> Jump to a page</div>
     <div class="d-flex flex-wrap gap-2">
-      <button v-for="a in AREAS" :key="a.id" class="lq-chip" :disabled="busy || failed" @click="jump(a.id)">
+      <button v-for="a in AREAS" :key="a.id" class="zt-chip" :disabled="busy || failed" @click="jump(a.id)">
         <span :style="{ color: a.ink }">{{ a.glyph }}</span> {{ a.id }}
         <span v-if="passport.byArea[a.id]" class="badge rounded-pill text-bg-danger">{{ passport.byArea[a.id].length }}</span>
       </button>
@@ -197,8 +208,14 @@ const areaStats = computed(() => AREAS.map((a) => ({ ...a, n: (passport.byArea[a
 </template>
 
 <style scoped>
-.stage { position: relative; width: 100%; aspect-ratio: 4 / 3.3; max-height: 62vh; border-radius: 24px; overflow: hidden; background: radial-gradient(circle at 50% 35%, #fff7e6, #f1e2c4 70%); box-shadow: inset 0 0 60px rgba(120, 80, 20, 0.15); }
-[data-bs-theme='dark'] .stage { background: radial-gradient(circle at 50% 35%, #3a3326, #1f1b14 70%); }
+.title { font-size: 2.4rem; }
+.stage {
+  position: relative; width: 100%; aspect-ratio: 4 / 3.3; max-height: 62vh; border-radius: 24px; overflow: hidden;
+  border: var(--zt-bw) solid var(--zt-line); box-shadow: var(--zt-shadow);
+  background-color: var(--zt-yellow);
+  background-image: repeating-conic-gradient(from 0deg at 50% 55%, rgba(255, 255, 255, 0.32) 0deg 9deg, rgba(255, 255, 255, 0) 9deg 18deg);
+}
+[data-bs-theme='dark'] .stage { background-color: #1b1b1b; background-image: repeating-conic-gradient(from 0deg at 50% 55%, rgba(255, 204, 0, 0.1) 0deg 9deg, rgba(255, 204, 0, 0) 9deg 18deg); }
 .stage canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: pointer; }
 .stage.busy canvas { cursor: progress; }
 </style>
