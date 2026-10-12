@@ -20,8 +20,8 @@ export function checkInStatus({ place, position, fake = false }) {
   }
   const radius = radiusFor(accuracy)
   const d = distanceM(position, place)
-  if (d > radius) return { ok: false, code: 'far', distance: d, radius, message: `${Math.round(d)} m away — get within ${radius} m to stamp.` }
-  return { ok: true, distance: d, radius, message: 'In range — stamp it!' }
+  if (d > radius) return { ok: false, code: 'far', distance: d, radius, message: `${Math.round(d)} m away. Get within ${radius} m to stamp.` }
+  return { ok: true, distance: d, radius, message: 'In range. Stamp it!' }
 }
 
 export function sameSgDay(aMs, bMs) {

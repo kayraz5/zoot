@@ -3,7 +3,7 @@ import { getDb, isGuestMode, setGuestMode } from '../lib/db/index.js'
 import { HAS_SUPABASE } from '../lib/config.js'
 import { levelFor, titleFor } from '../lib/xp.js'
 
-/** Session + profile (Nathanael's lane). */
+/** Session + profile (Steven's lane). */
 export const useUserStore = defineStore('user', {
   state: () => ({ session: null, profile: null, ready: false, mode: 'local', _init: null }),
   getters: {

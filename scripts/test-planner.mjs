@@ -10,10 +10,10 @@ const T3 = { label: 'Changi Airport T3', kind: 'airport', lat: 1.3563, lng: 103.
 const start = Date.parse('2026-09-25T02:00:00Z') // 10:00 SGT
 
 const cases = [
-  { name: 'Jackson 8h budget', hours: 8, style: 'budget', interests: ['hawker', 'gardens', 'photo'] },
-  { name: 'Jackson 14h adventurous', hours: 14, style: 'adventurous', interests: ['hawker', 'gardens', 'photo'] },
-  { name: 'Jackson 8h forced rain', hours: 8, style: 'budget', interests: ['hawker', 'gardens', 'photo'], forceRain: true },
-  { name: 'Jackson 14h forced rain', hours: 14, style: 'adventurous', interests: ['hawker', 'gardens', 'photo'], forceRain: true },
+  { name: 'Sonion 8h budget', hours: 8, style: 'budget', interests: ['hawker', 'gardens', 'photo'] },
+  { name: 'Sonion 14h adventurous', hours: 14, style: 'adventurous', interests: ['hawker', 'gardens', 'photo'] },
+  { name: 'Sonion 8h forced rain', hours: 8, style: 'budget', interests: ['hawker', 'gardens', 'photo'], forceRain: true },
+  { name: 'Sonion 14h forced rain', hours: 14, style: 'adventurous', interests: ['hawker', 'gardens', 'photo'], forceRain: true },
   { name: '6h party', hours: 6, style: 'party', interests: ['nightlife', 'food'] },
   { name: 'Late 14h (MRT closes)', hours: 14, style: 'budget', interests: ['hawker', 'nightlife'], startOffsetH: 8 },
   { name: '2h refuse', hours: 2, style: 'budget', interests: ['hawker'] }
@@ -49,7 +49,7 @@ const baseCtx = {
   style: 'budget', interests: ['hawker', 'gardens', 'photo'], energy: 'med', maxWalk: 18
 }
 const reply = (status, json) => async () => ({ status, ok: status < 300, json: async () => json })
-const choice = (ids) => ({ model: 'mock-llama', choice: { schema: 'layquest.choice.v1', title: 'Satay & Supertrees', picks: ids.map((id) => ({ place_id: id, why: `Because ${id} rocks.` })) } })
+const choice = (ids) => ({ model: 'mock-llama', choice: { schema: 'zoot.choice.v1', title: 'Satay & Supertrees', picks: ids.map((id) => ({ place_id: id, why: `Because ${id} rocks.` })) } })
 
 async function groqCase(name, responses, expect) {
   let calls = 0

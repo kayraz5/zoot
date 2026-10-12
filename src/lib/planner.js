@@ -9,13 +9,13 @@ import { isOpenFor, fmtTime } from './hours.js'
  * Groq may choose places (see groq.js), but minutes always come from here.
  */
 
-export const MISSION_SCHEMA = 'layquest.mission.v1'
+export const MISSION_SCHEMA = 'zoot.mission.v1'
 const MIN = 60000
 const CLUSTER_RADIUS_M = 1200
 const ZIGZAG_LIMIT_M = 2500
 export const RAIN_LIMIT = 60
 
-/** Buffers shown in the UI so Jackson can see why the plan is shorter than his layover. */
+/** Buffers shown in the UI so Sonion can see why the plan is shorter than his layover. */
 export function computeBudget({ origin, startMs, mustReturnMs, cleared = false }) {
   const airport = origin.kind === 'airport'
   const exit_min = airport && !cleared ? 30 : 0 // arrival immigration + bags to landside
@@ -90,7 +90,7 @@ export function scorePlace(p, ctx, budget) {
   if (ctx.indoorPref === 'prefer' && p.indoor) s += 0.8
   if (ctx.energy === 'low' && p.duration_min > 60) s -= 0.5
   if (ctx.energy === 'high' && !p.indoor) s += 0.3
-  // Airport-adjacent sights are saved for short windows: Jackson passes Jewel on the way back anyway.
+  // Airport-adjacent sights are saved for short windows: Sonion passes Jewel on the way back anyway.
   if (budget?.airport && p.area === 'Changi' && budget.usable_min >= 240) s *= 0.5
   return Math.max(0.2, s)
 }
@@ -286,7 +286,7 @@ function startOf(ctx, budget) {
 export function planDeterministic(ctx) {
   const budget = computeBudget(ctx)
   if (budget.usable_min < 60) {
-    return { ok: false, budget, reason: `Only ${Math.max(0, budget.usable_min)} usable minutes after buffers. Stay airside — leaving the airport is not safe with this window.` }
+    return { ok: false, budget, reason: `Only ${Math.max(0, budget.usable_min)} usable minutes after buffers. Stay airside. Leaving the airport is not safe with this window.` }
   }
   const start = startOf(ctx, budget)
   const cands = buildCandidates(ctx, budget)

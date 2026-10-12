@@ -31,8 +31,8 @@ on conflict (id) do update set place_id = excluded.place_id, title = excluded.ti
 
 -- Sample advisory so the P1 alerts slot has data. Clearly marked as demo content.
 insert into public.advisories (area, severity, source, headline, starts, ends)
-select 'Marina Bay', 2, 'LayQuest demo data', 'Demo: afternoon thunderstorms likely — outdoor stops may be swapped indoor.', now(), now() + interval '1 day'
-where not exists (select 1 from public.advisories where source = 'LayQuest demo data');
+select 'Marina Bay', 2, 'Zoot demo data', 'Demo: afternoon thunderstorms likely — outdoor stops may be swapped indoor.', now(), now() + interval '1 day'
+where not exists (select 1 from public.advisories where source = 'Zoot demo data');
 `
 writeFileSync(new URL('../supabase/seed.sql', import.meta.url), sql)
 console.log(`supabase/seed.sql written: ${places.length} places, ${SIDEQUESTS.length} sidequests`)

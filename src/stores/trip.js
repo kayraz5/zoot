@@ -5,7 +5,7 @@ import { now } from '../lib/clock.js'
 import { toSgLocalInput, fromSgLocalInput } from '../lib/hours.js'
 import { useUserStore } from './user.js'
 
-/** Planner form draft + saved trip rows (Ganaden: form UI · Kayra: trips table). */
+/** Planner form draft + saved trip rows (Kayra: form + trips table). */
 export const useTripStore = defineStore('trip', {
   state: () => ({
     draft: defaultDraft(),

@@ -5,8 +5,8 @@ import { getDb } from '../lib/db/index.js'
 export const usePassportStore = defineStore('passport', {
   state: () => ({
     stamps: [],
-    pendingSlams: read('lq.pendingSlams', []),
-    seen: new Set(read('lq.seen', []))
+    pendingSlams: read('zoot.pendingSlams', []),
+    seen: new Set(read('zoot.seen', []))
   }),
   getters: {
     stampedIds: (s) => new Set(s.stamps.map((x) => x.place_id)),
@@ -29,17 +29,17 @@ export const usePassportStore = defineStore('passport', {
       this.markSeen([stamp.place_id])
       if (firstInArea && stamp.area) {
         this.pendingSlams.push(stamp.area)
-        write('lq.pendingSlams', this.pendingSlams)
+        write('zoot.pendingSlams', this.pendingSlams)
       }
       return firstInArea
     },
     consumeSlam(area) {
       this.pendingSlams = this.pendingSlams.filter((a) => a !== area)
-      write('lq.pendingSlams', this.pendingSlams)
+      write('zoot.pendingSlams', this.pendingSlams)
     },
     markSeen(ids) {
       ids.forEach((id) => this.seen.add(id))
-      write('lq.seen', [...this.seen])
+      write('zoot.seen', [...this.seen])
     }
   }
 })

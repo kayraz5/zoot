@@ -8,11 +8,11 @@ import { localDb } from './local.js'
 let remote = null
 
 export function isGuestMode() {
-  try { return !HAS_SUPABASE || localStorage.getItem('lq.guest') === '1' } catch { return true }
+  try { return !HAS_SUPABASE || localStorage.getItem('zoot.guest') === '1' } catch { return true }
 }
 
 export function setGuestMode(on) {
-  try { on ? localStorage.setItem('lq.guest', '1') : localStorage.removeItem('lq.guest') } catch {}
+  try { on ? localStorage.setItem('zoot.guest', '1') : localStorage.removeItem('zoot.guest') } catch {}
 }
 
 export async function getDb() {

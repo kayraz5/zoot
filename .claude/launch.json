@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "layquest-dev",
+      "name": "zoot-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
@@ -15,7 +15,7 @@
       "port": 5173
     },
     {
-      "name": "layquest-prod-preview",
+      "name": "zoot-prod-preview",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",

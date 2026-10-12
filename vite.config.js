@@ -7,7 +7,7 @@ import vue from '@vitejs/plugin-vue'
  */
 function devApi() {
   return {
-    name: 'layquest-dev-api',
+    name: 'zoot-dev-api',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         if (!req.url?.startsWith('/api/')) return next()

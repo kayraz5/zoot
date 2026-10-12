@@ -74,7 +74,7 @@ export async function buildMission(ctx, { onStatus } = {}) {
 
 /** Place page AI blurb with a stored-content fallback and a local cache. */
 export async function summarizePlace(place) {
-  const key = `lq.summary.${place.id}`
+  const key = `zoot.summary.${place.id}`
   try {
     const cached = JSON.parse(localStorage.getItem(key))
     if (cached) return cached

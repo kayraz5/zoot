@@ -5,7 +5,7 @@ import { fetchForecast } from '../lib/weather.js'
 export const useUiStore = defineStore('ui', {
   state: () => ({
     theme: document.documentElement.getAttribute('data-bs-theme') || 'light',
-    forceRain: readFlag('lq.forceRain'),
+    forceRain: readFlag('zoot.forceRain'),
     toasts: [],
     celebration: null,
     weather: null,
@@ -15,11 +15,11 @@ export const useUiStore = defineStore('ui', {
     toggleTheme() {
       this.theme = this.theme === 'dark' ? 'light' : 'dark'
       document.documentElement.setAttribute('data-bs-theme', this.theme)
-      try { localStorage.setItem('lq.theme', this.theme) } catch {}
+      try { localStorage.setItem('zoot.theme', this.theme) } catch {}
     },
     setForceRain(on) {
       this.forceRain = on
-      try { localStorage.setItem('lq.forceRain', on ? '1' : '0') } catch {}
+      try { localStorage.setItem('zoot.forceRain', on ? '1' : '0') } catch {}
     },
     toast(message, variant = 'dark', ms = 3200) {
       const id = Math.random().toString(36).slice(2)

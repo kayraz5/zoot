@@ -23,7 +23,7 @@ export const geo = reactive({
 let watchId = null
 
 function readFake() {
-  try { return localStorage.getItem('lq.fakeGps') === '1' } catch { return false }
+  try { return localStorage.getItem('zoot.fakeGps') === '1' } catch { return false }
 }
 
 export function hasFix() {
@@ -55,7 +55,7 @@ export function stopGps() {
 
 export function setFake(on, seed) {
   geo.fake = on
-  try { localStorage.setItem('lq.fakeGps', on ? '1' : '0') } catch {}
+  try { localStorage.setItem('zoot.fakeGps', on ? '1' : '0') } catch {}
   if (on) {
     stopGps()
     geo.source = 'fake'

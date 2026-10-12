@@ -2,10 +2,10 @@ import { groqConfig, groqJson, tooLarge } from './_lib/groq.js'
 
 /**
  * POST /api/plan — Groq chooses places and writes copy. It never outputs minutes
- * or coordinates; the client validates the reply (layquest.choice.v1) and times
+ * or coordinates; the client validates the reply (zoot.choice.v1) and times
  * every leg with Turf + the MRT matrix. Any failure → client falls back.
  */
-const SYSTEM = `You are the itinerary chooser for LayQuest, a layover side-quest app in Singapore.
+const SYSTEM = `You are the itinerary chooser for Zoot, a layover side-quest app in Singapore.
 The traveller has a HARD return deadline. The app computes all travel and stay times; you only choose places and write copy.
 
 Rules:
@@ -19,7 +19,7 @@ Rules:
 - "title" is a playful mission title, max 40 characters. Do not reference any video game or franchise.
 
 Reply with JSON only, exactly this shape:
-{"schema":"layquest.choice.v1","title":"...","picks":[{"place_id":"...","why":"..."}]}`
+{"schema":"zoot.choice.v1","title":"...","picks":[{"place_id":"...","why":"..."}]}`
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' })

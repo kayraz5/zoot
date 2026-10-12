@@ -1,15 +1,15 @@
 /**
  * Hand-written validators for the two versioned JSON contracts.
  *
- *  layquest.choice.v1  — what Groq returns: which places + flavour copy. No minutes, no coordinates.
- *  layquest.mission.v1 — what the app stores and plays: legs timed by Turf + the MRT matrix.
+ *  zoot.choice.v1  — what Groq returns: which places + flavour copy. No minutes, no coordinates.
+ *  zoot.mission.v1 — what the app stores and plays: legs timed by Turf + the MRT matrix.
  *
  * Both return { ok, errors[] }. The pipeline retries Groq once on an invalid
  * choice, then falls back to the deterministic planner.
  */
 
-export const CHOICE_SCHEMA = 'layquest.choice.v1'
-export const MISSION_SCHEMA = 'layquest.mission.v1'
+export const CHOICE_SCHEMA = 'zoot.choice.v1'
+export const MISSION_SCHEMA = 'zoot.mission.v1'
 
 const STYLES = ['budget', 'adventurous', 'party', 'conservative']
 const MODES = ['walk', 'mrt', 'taxi']

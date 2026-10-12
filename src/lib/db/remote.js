@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config.js'
 
 /**
- * Supabase adapter (Kayra: schema/RPC · Nathanael: auth/profiles).
+ * Supabase adapter (Kayra: schema/RPC · Steven: auth/profiles).
  * Same interface as local.js. Check-ins go through the stamp_place() RPC,
  * which re-validates distance server-side — the client never inserts stamps directly.
  */

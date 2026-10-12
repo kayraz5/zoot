@@ -8,7 +8,7 @@ const offsetMs = ref(readOffset())
 export const tick = ref(Date.now())
 
 function readOffset() {
-  try { return Number(localStorage.getItem('lq.clockOffset') || 0) } catch { return 0 }
+  try { return Number(localStorage.getItem('zoot.clockOffset') || 0) } catch { return 0 }
 }
 
 export function now() {
@@ -21,13 +21,13 @@ export function clockOffsetMin() {
 
 export function skipMinutes(min) {
   offsetMs.value += min * 60000
-  try { localStorage.setItem('lq.clockOffset', String(offsetMs.value)) } catch {}
+  try { localStorage.setItem('zoot.clockOffset', String(offsetMs.value)) } catch {}
   tick.value = now()
 }
 
 export function resetClock() {
   offsetMs.value = 0
-  try { localStorage.removeItem('lq.clockOffset') } catch {}
+  try { localStorage.removeItem('zoot.clockOffset') } catch {}
   tick.value = now()
 }
 

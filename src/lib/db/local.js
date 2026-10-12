@@ -1,10 +1,11 @@
 import { checkInStatus, sameSgDay } from '../checkin.js'
+import { DEFAULT_COVER } from '../brand.js'
 
 /**
  * Guest-mode adapter: same interface as remote.js, stored in localStorage.
  * Lets the app run with zero keys (and keeps the demo alive if Supabase is down).
  */
-const K = { session: 'lq.session', profile: 'lq.profile', trips: 'lq.trips', missions: 'lq.missions', stamps: 'lq.stamps' }
+const K = { session: 'zoot.session', profile: 'zoot.profile', trips: 'zoot.trips', missions: 'zoot.missions', stamps: 'zoot.stamps' }
 
 function read(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback } catch { return fallback }
@@ -13,7 +14,6 @@ function write(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)) } catch {}
 }
 
-const COVERS = ['#0e6f69', '#1f3c88', '#7a1f3d', '#2d5a27', '#5b2a86']
 
 export const localDb = {
   kind: 'local',
@@ -30,7 +30,7 @@ export const localDb = {
       const id = 'guest-' + crypto.randomUUID()
       profile = {
         id, display_name: displayName || 'Field Traveller', style: null, xp: 0, home_city: null, is_verified: false,
-        avatar_seed: Math.floor(Math.random() * 1e6), cover_color: COVERS[Math.floor(Math.random() * COVERS.length)],
+        avatar_seed: Math.floor(Math.random() * 1e6), cover_color: DEFAULT_COVER,
         created_at: new Date().toISOString()
       }
       write(K.profile, profile)
@@ -102,7 +102,7 @@ export const localDb = {
     const stamps = read(K.stamps, [])
     const now = Date.now()
     if (stamps.some((s) => s.user_id === userId && s.place_id === place.id && sameSgDay(Date.parse(s.stamped_at), now))) {
-      throw new Error('Already stamped here today — one chop per place per day.')
+      throw new Error('Already stamped here today. One chop per place per day.')
     }
     const stamp = {
       id: crypto.randomUUID(), user_id: userId, place_id: place.id, mission_id: missionId || null,

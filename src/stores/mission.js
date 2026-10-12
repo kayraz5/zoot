@@ -12,7 +12,7 @@ import { useUiStore } from './ui.js'
 import { useUserStore } from './user.js'
 import { usePassportStore } from './passport.js'
 
-const ACTIVE_KEY = 'lq.activeMission'
+const ACTIVE_KEY = 'zoot.activeMission'
 const SIDEQUEST_RADIUS_M = 400
 const SIDEQUEST_BUFFER_MIN = 10
 
@@ -156,7 +156,7 @@ export const useMissionStore = defineStore('mission', {
       r.mission.prefs = { ...r.mission.prefs, ...prefs }
       r.mission.replans = (m.replans || 0) + 1
       await this.persist(r.mission)
-      useUiStore().toast(labelFor(mode) + ' — future stops rewritten.', 'success')
+      useUiStore().toast(labelFor(mode) + ': future stops rewritten.', 'success')
       return true
     },
 
