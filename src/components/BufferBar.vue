@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { fmtDuration } from '../lib/hours.js'
 
-/** The buffers Jackson has to trust, as one proportional bar. */
+/** The buffers a traveller has to trust, as one proportional bar. */
 const props = defineProps({
   windowMin: Number, exitMin: Number, outMin: Number, reentryMin: Number, safetyMin: Number
 })
@@ -30,14 +30,16 @@ const segs = computed(() => {
 </template>
 
 <style scoped>
-.bar { display: flex; height: 16px; border-radius: 999px; overflow: hidden; gap: 2px; background: var(--lq-line); }
-.seg { min-width: 6px; }
-.exit, .legend i.exit { background: #9aa9b0; }
-.out, .legend i.out { background: var(--lq-teal); }
-.spare, .legend i.spare { background: repeating-linear-gradient(45deg, #c8efe9, #c8efe9 5px, #e6f8f5 5px, #e6f8f5 10px); }
-.reentry, .legend i.reentry { background: var(--lq-sky); }
-.safety, .legend i.safety { background: var(--lq-coral); }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 0.8rem; color: var(--lq-muted); }
-.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
-.legend b { color: var(--lq-ink); }
+.bar { display: flex; height: 22px; border-radius: 999px; overflow: hidden; border: var(--zt-bw) solid var(--zt-line); background: var(--zt-card); }
+.seg { min-width: 8px; border-right: 2px solid var(--zt-line); }
+.seg:last-child { border-right: none; }
+.exit, .legend i.exit { background: #cfc8ad; }
+.out, .legend i.out { background: var(--zt-yellow); }
+.spare, .legend i.spare { background: repeating-linear-gradient(45deg, var(--zt-yellow-pale), var(--zt-yellow-pale) 5px, #fff 5px, #fff 10px); }
+.reentry, .legend i.reentry { background: #111; }
+.safety, .legend i.safety { background: var(--zt-pink); }
+[data-bs-theme='dark'] .reentry, [data-bs-theme='dark'] .legend i.reentry { background: #6b6b6b; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 0.76rem; color: var(--zt-muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 5px; vertical-align: -1px; border: 1.5px solid var(--zt-line); }
+.legend b { color: var(--zt-ink); }
 </style>

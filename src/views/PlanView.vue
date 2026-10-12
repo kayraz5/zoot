@@ -12,7 +12,7 @@ import { now, tick } from '../lib/clock.js'
 import BufferBar from '../components/BufferBar.vue'
 import WeatherChip from '../components/WeatherChip.vue'
 
-/** Clock form (Ganaden: UI · Kayra: trips row · planner: lib/planner.js). */
+/** Clock form (Kayra: itinerary engine, lib/planner.js). */
 const trip = useTripStore()
 const mission = useMissionStore()
 const user = useUserStore()
@@ -50,17 +50,17 @@ async function submit() {
 </script>
 
 <template>
-  <main class="lq-page">
+  <main class="zt-page">
     <div class="d-flex align-items-center justify-content-between mb-2">
       <div>
-        <h1 class="h3 mb-0">Plan a layover</h1>
+        <h1 class="mb-0" style="font-size: 2.4rem">Plan a layover</h1>
         <p class="text-muted mb-0 small">Clock first, then the fun.</p>
       </div>
       <WeatherChip />
     </div>
 
     <form class="d-grid gap-3 mt-3" @submit.prevent="submit">
-      <section class="lq-card p-3">
+      <section class="zt-card p-3">
         <label class="form-label">Where are you starting?</label>
         <div class="origin-grid">
           <button v-for="o in ORIGINS" :key="o.id" type="button" class="origin" :class="{ active: d.originId === o.id }" @click="d.originId = o.id" :aria-pressed="d.originId === o.id">
@@ -74,10 +74,10 @@ async function submit() {
         </div>
       </section>
 
-      <section class="lq-card p-3">
+      <section class="zt-card p-3">
         <div class="d-flex justify-content-between align-items-baseline">
           <label class="form-label mb-0" for="hours">Hours until you must be back</label>
-          <span class="h4 mb-0 mono">{{ d.hours }} h</span>
+          <span class="hours-num mono">{{ d.hours }} h</span>
         </div>
         <input id="hours" type="range" class="form-range" min="2" max="16" step="0.5" :value="d.hours" @input="trip.setHours(Number($event.target.value))" />
         <label class="form-label mt-2" for="ret">{{ trip.origin.kind === 'airport' ? 'Gate / boarding time' : 'Must be back at the hotel by' }} <span class="text-muted fw-normal">(Singapore time)</span></label>
@@ -96,16 +96,16 @@ async function submit() {
         </div>
       </section>
 
-      <section class="lq-card p-3">
+      <section class="zt-card p-3">
         <label class="form-label">What are you into?</label>
         <div class="d-flex flex-wrap gap-2">
-          <button v-for="i in INTERESTS" :key="i.id" type="button" class="lq-chip" :class="{ active: d.interests.includes(i.id) }" :aria-pressed="d.interests.includes(i.id)" @click="toggleInterest(i.id)">
+          <button v-for="i in INTERESTS" :key="i.id" type="button" class="zt-chip" :class="{ active: d.interests.includes(i.id) }" :aria-pressed="d.interests.includes(i.id)" @click="toggleInterest(i.id)">
             <i class="bi" :class="i.icon"></i>{{ i.label }}
           </button>
         </div>
       </section>
 
-      <section class="lq-card p-3">
+      <section class="zt-card p-3">
         <div class="row g-3">
           <div class="col-sm-6">
             <label class="form-label">Energy</label>
@@ -134,13 +134,13 @@ async function submit() {
           </div>
         </div>
         <p class="tiny text-muted mt-3 mb-0">
-          Travel style: <span class="lq-pill"><i class="bi" :class="style.icon"></i> {{ style.label }}</span>
+          Travel style: <span class="zt-pill"><i class="bi" :class="style.icon"></i> {{ style.label }}</span>
           <RouterLink to="/onboard" class="ms-1">change</RouterLink>
         </p>
       </section>
 
       <div v-if="tooShort" class="alert alert-warning mb-0">
-        <i class="bi bi-exclamation-triangle"></i> With these buffers you’d have {{ Math.max(0, budget.usable_min) }} minutes outside. LayQuest won’t plan a trip that risks your flight — stay airside and explore the terminal.
+        <i class="bi bi-exclamation-triangle"></i> With these buffers you’d have {{ Math.max(0, budget.usable_min) }} minutes outside. Zoot won’t plan a trip that risks your flight. Stay airside and explore the terminal.
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="planning || tooShort || !d.interests.length">
@@ -149,7 +149,7 @@ async function submit() {
     </form>
 
     <div v-if="planning" class="planning-overlay" role="alert" aria-live="assertive">
-      <div class="lq-card p-4 text-center">
+      <div class="zt-card p-4 text-center">
         <div class="spinner-border text-primary mb-3" role="status"></div>
         <div class="fw-800">{{ mission.statusText || 'Plotting your quest…' }}</div>
         <div class="tiny text-muted mt-1">Turf clusters · MRT matrix · Open-Meteo · Groq</div>
@@ -160,9 +160,11 @@ async function submit() {
 </template>
 
 <style scoped>
-.origin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
-.origin { border: 2px solid var(--lq-line); background: var(--lq-card); border-radius: 16px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 0.85rem; color: var(--lq-ink); }
-.origin i { font-size: 1.4rem; color: var(--lq-teal); }
-.origin.active { border-color: var(--lq-teal); background: rgba(18, 179, 168, 0.1); }
-.planning-overlay { position: fixed; inset: 0; z-index: 1500; display: grid; place-items: center; background: rgba(10, 30, 36, 0.4); backdrop-filter: blur(3px); padding: 16px; }
+.origin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+.origin { border: var(--zt-bw) solid var(--zt-line); background: var(--zt-card); border-radius: 16px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--zt-ink); transition: transform 0.08s, box-shadow 0.08s; }
+.origin i { font-size: 1.5rem; }
+.origin.active { background: var(--zt-yellow); color: #111; box-shadow: 0 4px 0 var(--zt-shadow-color); transform: translateY(-3px); }
+.hours-num { font-family: var(--zt-font-display); font-size: 2.4rem; line-height: 1; }
+.planning-overlay { position: fixed; inset: 0; z-index: 1500; display: grid; place-items: center; background: rgba(17, 17, 17, 0.55); padding: 16px; }
+.planning-overlay .zt-card { box-shadow: 8px 8px 0 var(--zt-shadow-color); }
 </style>

@@ -2,51 +2,61 @@
 import { computed } from 'vue'
 
 /**
- * Procedural postcard art for a place: area palette + category icon.
+ * Procedural poster art for a place in the Zoot palette: sunburst, outlined skyline, category icon.
  * Replace with a real photo by setting `image_url` in the places table (Hulbert's content lane).
  */
 const props = defineProps({ place: { type: Object, required: true }, height: { type: Number, default: 160 }, rounded: { type: Boolean, default: true } })
 
-const PALETTES = {
-  Changi: ['#9be7ff', '#d8c8ff'], 'Marina Bay': ['#ffb88c', '#8ec5ff'], 'Civic District': ['#c8b6ff', '#ffd6a5'],
-  Chinatown: ['#ff9a8b', '#ffd166'], 'Tiong Bahru': ['#a8e6cf', '#dcedc1'], 'Kampong Glam': ['#ffd166', '#06d6a0'],
-  'Little India': ['#ff8fab', '#ffc6ff'], Orchard: ['#b9fbc0', '#98f5e1'], Tanglin: ['#95d5b2', '#d8f3dc'],
-  'East Coast': ['#90e0ef', '#caf0f8'], HarbourFront: ['#48cae4', '#ade8f4'], Sentosa: ['#ffe066', '#72efdd'],
-  West: ['#e9c46a', '#f4a261'], North: ['#b7e4c7', '#74c69d']
-}
+// [background, sunburst ray, icon disc, sparkles]
+const SCHEMES = [
+  ['#ffcc00', 'rgba(255,255,255,0.38)', '#ffffff', '#111111'],
+  ['#fff4c2', 'rgba(255,204,0,0.55)', '#ffcc00', '#111111'],
+  ['#f83878', 'rgba(255,255,255,0.22)', '#ffffff', '#111111'],
+  ['#111111', 'rgba(255,204,0,0.2)', '#ffcc00', '#ffcc00']
+]
 const ICONS = {
-  hawker: 'bi-egg-fried', food: 'bi-cup-hot', gardens: 'bi-flower1', views: 'bi-binoculars', museum: 'bi-easel', temple: 'bi-bank2',
-  heritage: 'bi-hourglass-split', nightlife: 'bi-moon-stars', shopping: 'bi-bag-heart', beach: 'bi-water', nature: 'bi-tree',
-  photo: 'bi-camera', architecture: 'bi-buildings', art: 'bi-palette', coffee: 'bi-cup-straw', culture: 'bi-globe-asia-australia',
-  family: 'bi-emoji-smile', rides: 'bi-rocket-takeoff'
+  hawker: 'bi-egg-fried', food: 'bi-cup-hot-fill', gardens: 'bi-flower1', views: 'bi-binoculars-fill', museum: 'bi-easel-fill', temple: 'bi-bank2',
+  heritage: 'bi-hourglass-split', nightlife: 'bi-moon-stars-fill', shopping: 'bi-bag-heart-fill', beach: 'bi-water', nature: 'bi-tree-fill',
+  photo: 'bi-camera-fill', architecture: 'bi-buildings-fill', art: 'bi-palette-fill', coffee: 'bi-cup-straw', culture: 'bi-globe-asia-australia',
+  family: 'bi-emoji-smile-fill', rides: 'bi-rocket-takeoff-fill'
 }
-const colors = computed(() => PALETTES[props.place.area] || ['#a0e7e5', '#b4f8c8'])
-const icon = computed(() => ICONS[props.place.tags?.[0]] || 'bi-geo-alt')
 const seed = computed(() => [...props.place.id].reduce((s, ch) => s + ch.charCodeAt(0), 0))
-const bars = computed(() => Array.from({ length: 9 }, (_, i) => 18 + ((seed.value * (i + 3)) % 46)))
+const scheme = computed(() => SCHEMES[seed.value % SCHEMES.length])
+const icon = computed(() => ICONS[props.place.tags?.[0]] || 'bi-geo-alt-fill')
+const bars = computed(() => Array.from({ length: 9 }, (_, i) => 22 + ((seed.value * (i + 3)) % 48)))
 </script>
 
 <template>
-  <div class="art" :class="{ rounded }" :style="{ height: height + 'px', '--a': colors[0], '--b': colors[1] }" role="img" :aria-label="place.name">
+  <div class="art" :class="{ rounded }" role="img" :aria-label="place.name"
+    :style="{ height: height + 'px', '--bg': scheme[0], '--ray': scheme[1], '--disc': scheme[2], '--spark': scheme[3] }">
     <img v-if="place.image_url" :src="place.image_url" :alt="place.name" class="photo" loading="lazy" />
     <template v-else>
-      <div class="sun"></div>
       <div class="skyline">
         <span v-for="(h, i) in bars" :key="i" :style="{ height: h + '%' }"></span>
       </div>
-      <i class="bi glyph" :class="icon" aria-hidden="true"></i>
+      <div class="disc"><i class="bi" :class="icon" aria-hidden="true"></i></div>
+      <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span>
     </template>
     <span class="area-tag">{{ place.area }}</span>
   </div>
 </template>
 
 <style scoped>
-.art { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--a), var(--b)); }
+.art {
+  position: relative; overflow: hidden; border: var(--zt-bw) solid var(--zt-line);
+  background-color: var(--bg);
+  background-image: repeating-conic-gradient(from 0deg at 50% 78%, var(--ray) 0deg 10deg, transparent 10deg 20deg);
+}
 .art.rounded { border-radius: 18px; }
 .photo { width: 100%; height: 100%; object-fit: cover; }
-.sun { position: absolute; width: 38%; aspect-ratio: 1; border-radius: 50%; right: 8%; top: 12%; background: rgba(255, 255, 255, 0.45); }
-.skyline { position: absolute; left: 0; right: 0; bottom: 0; height: 55%; display: flex; align-items: flex-end; gap: 4%; padding: 0 6%; opacity: 0.35; }
-.skyline span { flex: 1; background: #fff; border-radius: 6px 6px 0 0; }
-.glyph { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 3.2rem; color: #fff; text-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); }
-.area-tag { position: absolute; left: 10px; bottom: 10px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; background: rgba(0, 0, 0, 0.22); padding: 3px 9px; border-radius: 999px; }
+.skyline { position: absolute; left: 0; right: 0; bottom: -2px; height: 46%; display: flex; align-items: flex-end; gap: 3%; padding: 0 5%; }
+.skyline span { flex: 1; background: #fff; border: 2px solid #111; border-bottom: none; border-radius: 5px 5px 0 0; }
+.disc {
+  position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%) rotate(-6deg);
+  width: 34%; max-width: 92px; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  background: var(--disc); color: #111; border: var(--zt-bw) solid #111; box-shadow: 4px 4px 0 #111; font-size: clamp(1.3rem, 5vw, 2.2rem);
+}
+.spark { position: absolute; color: var(--spark); font-size: 1rem; opacity: 0.9; }
+.s1 { left: 12%; top: 16%; } .s2 { right: 14%; top: 24%; font-size: 1.4rem; } .s3 { right: 30%; top: 10%; font-size: 0.7rem; }
+.area-tag { position: absolute; left: 10px; top: 10px; font-size: 0.64rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #111; background: #fff; border: 2px solid #111; padding: 2px 9px; border-radius: 999px; }
 </style>

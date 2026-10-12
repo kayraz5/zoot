@@ -25,27 +25,28 @@ export const INTERESTS = [
   { id: 'beach', label: 'Beach', icon: 'bi-water' }
 ]
 
+// Travel styles. `color` fills the badge, `on` is the icon colour that reads on top of it.
 export const STYLES = {
-  budget: { label: 'Budget', icon: 'bi-piggy-bank', blurb: 'Hawkers, free sights, MRT everywhere.', color: '#12b3a8' },
-  adventurous: { label: 'Adventurous', icon: 'bi-compass', blurb: 'More stops, more walking, big views.', color: '#ff6b5b' },
-  party: { label: 'Party', icon: 'bi-stars', blurb: 'Buzzing streets, late food, rooftop energy.', color: '#8e6bff' },
-  conservative: { label: 'Conservative', icon: 'bi-shield-check', blurb: 'Fewer stops, big buffers, indoor-friendly.', color: '#2f7de1' }
+  budget: { label: 'Budget', icon: 'bi-piggy-bank-fill', blurb: 'Hawkers, free sights, MRT everywhere.', color: '#ffcc00', on: '#111111' },
+  adventurous: { label: 'Adventurous', icon: 'bi-compass-fill', blurb: 'More stops, more walking, big views.', color: '#f83878', on: '#111111' },
+  party: { label: 'Party', icon: 'bi-stars', blurb: 'Buzzing streets, late food, rooftop energy.', color: '#111111', on: '#ffcc00' },
+  conservative: { label: 'Conservative', icon: 'bi-shield-fill-check', blurb: 'Fewer stops, big buffers, indoor-friendly.', color: '#fff4c2', on: '#111111' }
 }
 
 /** Passport pages, in book order. Colours are the chop ink per area. */
 export const AREAS = [
-  { id: 'Changi', ink: '#c0392b', glyph: '✈' },
-  { id: 'Marina Bay', ink: '#d35400', glyph: '◈' },
-  { id: 'Civic District', ink: '#8e44ad', glyph: '⚖' },
-  { id: 'Chinatown', ink: '#c0392b', glyph: '龍' },
-  { id: 'Tiong Bahru', ink: '#16a085', glyph: '◐' },
-  { id: 'Kampong Glam', ink: '#b8860b', glyph: '☾' },
-  { id: 'Little India', ink: '#d81b60', glyph: '✿' },
-  { id: 'Orchard', ink: '#2e7d32', glyph: '❦' },
-  { id: 'Tanglin', ink: '#388e3c', glyph: '❀' },
-  { id: 'East Coast', ink: '#1565c0', glyph: '≈' },
-  { id: 'HarbourFront', ink: '#00838f', glyph: '⚓' },
-  { id: 'Sentosa', ink: '#ef6c00', glyph: '☀' },
-  { id: 'West', ink: '#6d4c41', glyph: '⛩' },
-  { id: 'North', ink: '#558b2f', glyph: '♣' }
+  { id: 'Changi', ink: '#111111', glyph: '✈' },
+  { id: 'Marina Bay', ink: '#e0245e', glyph: '◈' },
+  { id: 'Civic District', ink: '#d93a00', glyph: '⚖' },
+  { id: 'Chinatown', ink: '#c1121f', glyph: '龍' },
+  { id: 'Tiong Bahru', ink: '#111111', glyph: '◐' },
+  { id: 'Kampong Glam', ink: '#b07d00', glyph: '☾' },
+  { id: 'Little India', ink: '#e0245e', glyph: '✿' },
+  { id: 'Orchard', ink: '#d93a00', glyph: '❦' },
+  { id: 'Tanglin', ink: '#111111', glyph: '❀' },
+  { id: 'East Coast', ink: '#b07d00', glyph: '≈' },
+  { id: 'HarbourFront', ink: '#c1121f', glyph: '⚓' },
+  { id: 'Sentosa', ink: '#e0245e', glyph: '☀' },
+  { id: 'West', ink: '#d93a00', glyph: '⛩' },
+  { id: 'North', ink: '#111111', glyph: '♣' }
 ]

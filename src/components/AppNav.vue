@@ -8,7 +8,7 @@ const items = [
 </script>
 
 <template>
-  <nav class="lq-nav lq-glass" aria-label="Main">
+  <nav class="zt-nav zt-glass" aria-label="Main">
     <RouterLink v-for="i in items" :key="i.to" :to="i.to">
       <i class="bi" :class="i.icon" aria-hidden="true"></i>
       <span>{{ i.label }}</span>

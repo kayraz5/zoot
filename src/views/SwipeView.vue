@@ -56,7 +56,7 @@ function pass() {
 async function take() {
   const sq = top.value
   if (!sq.eligible) {
-    ui.toast('Not enough time for this one — it would break your buffer.', 'warning')
+    ui.toast('Not enough time for this one. It would break your buffer.', 'warning')
     return pass()
   }
   await store.acceptSidequest({ ...sq })
@@ -65,8 +65,8 @@ async function take() {
 </script>
 
 <template>
-  <main class="lq-page" style="max-width: 460px">
-    <h1 class="h3 mb-1">Sidequest deck</h1>
+  <main class="zt-page" style="max-width: 460px">
+    <h1 class="title mb-1">Sidequest deck</h1>
     <p class="text-muted small">Swipe right to add it before your next stop. Future legs are re-timed.</p>
 
     <div v-if="!store.mission" class="text-center py-5 text-muted">Plan a mission first. <RouterLink to="/plan">Plan</RouterLink></div>
@@ -77,13 +77,13 @@ async function take() {
     </div>
     <div v-else class="deck">
       <div class="card-stack">
-        <div v-if="deck[1]" class="swipe-card lq-card under"></div>
-        <div class="swipe-card lq-card" :class="{ off: !top.eligible }"
+        <div v-if="deck[1]" class="swipe-card zt-card under"></div>
+        <div class="swipe-card zt-card" :class="{ off: !top.eligible }"
           :style="{ transform: `translateX(${drag.x}px) rotate(${drag.x / 18}deg)`, transition: drag.active ? 'none' : 'transform .25s' }"
           @pointerdown="down" @pointermove="move" @pointerup="up" @pointercancel="up">
           <PlaceArt :place="top.place" :height="200" />
           <div class="p-3">
-            <span class="lq-pill sun mb-2"><i class="bi bi-gem"></i> +{{ top.xp }} XP · {{ top.stay_min }} min</span>
+            <span class="zt-pill pale mb-2"><i class="bi bi-gem"></i> +{{ top.xp }} XP · {{ top.stay_min }} min</span>
             <h2 class="h4 mb-1">{{ top.title }}</h2>
             <div class="small text-muted mb-2">{{ top.place.name }} · {{ Math.round(top.near) }} m from your route</div>
             <p class="mb-0">{{ top.prompt }}</p>
@@ -102,14 +102,17 @@ async function take() {
 </template>
 
 <style scoped>
-.card-stack { position: relative; height: 430px; }
+.title { font-size: 2.4rem; }
+.card-stack { position: relative; height: 440px; }
 .swipe-card { position: absolute; inset: 0; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; }
-.swipe-card.under { transform: scale(0.95) translateY(12px); opacity: 0.6; }
-.swipe-card.off { filter: grayscale(0.7); }
-.stamp-hint { position: absolute; top: 24px; font-family: 'Fredoka', sans-serif; font-size: 1.8rem; font-weight: 700; padding: 2px 12px; border: 4px solid; border-radius: 12px; transform: rotate(-12deg); }
-.stamp-hint.yes { left: 20px; color: var(--lq-teal); }
-.stamp-hint.no { right: 20px; color: var(--lq-coral); transform: rotate(12deg); }
-.round-btn { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--lq-line); background: var(--lq-card); font-size: 1.5rem; color: var(--lq-coral); box-shadow: var(--lq-shadow); }
-.round-btn.yes { color: #fff; background: var(--lq-teal); border-color: var(--lq-teal); }
+.swipe-card.under { transform: scale(0.95) translateY(12px); opacity: 0.7; }
+.swipe-card.off { filter: grayscale(0.8); }
+.swipe-card :deep(.art) { border-width: 0 0 var(--zt-bw) 0; border-radius: 0; }
+.stamp-hint { position: absolute; top: 24px; font-family: var(--zt-font-display); font-size: 2.2rem; line-height: 1; padding: 6px 14px 2px; border: var(--zt-bw) solid #111; border-radius: 12px; color: #111; transform: rotate(-12deg); box-shadow: 4px 4px 0 #111; }
+.stamp-hint.yes { left: 20px; background: var(--zt-yellow); }
+.stamp-hint.no { right: 20px; background: #fff; transform: rotate(12deg); }
+.round-btn { width: 66px; height: 66px; border-radius: 50%; border: var(--zt-bw) solid var(--zt-line); background: var(--zt-card); font-size: 1.5rem; color: var(--zt-ink); box-shadow: 0 4px 0 var(--zt-shadow-color); }
+.round-btn.yes { color: #111; background: var(--zt-yellow); }
+.round-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--zt-shadow-color); }
 .round-btn:disabled { opacity: 0.4; }
 </style>

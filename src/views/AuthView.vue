@@ -40,10 +40,12 @@ async function guest() {
 </script>
 
 <template>
-  <main class="lq-page" style="max-width: 460px">
+  <main class="zt-page" style="max-width: 460px">
     <RouterLink to="/" class="btn btn-link px-0 mb-2"><i class="bi bi-arrow-left"></i> Back</RouterLink>
-    <div class="lq-card p-4">
-      <h1 class="h3 mb-1">Board the quest</h1>
+    <div class="zt-card overflow-hidden">
+      <div class="banner" role="img" aria-label="A traveller reading a yellow Zoot passport"></div>
+      <div class="p-4">
+      <h1 class="title mb-1">Board the quest</h1>
       <p class="text-muted">Your stamps, XP and passport follow your account.</p>
 
       <form v-if="user.canUseEmail && !sent" @submit.prevent="sendLink" class="mb-3">
@@ -63,13 +65,16 @@ async function guest() {
 
       <label class="form-label" for="name">Play as guest</label>
       <input id="name" v-model="name" class="form-control mb-2" placeholder="Traveller name (optional)" maxlength="32" />
-      <button class="btn btn-coral w-100" :disabled="busy" @click="guest"><i class="bi bi-person-walking"></i> Continue as guest</button>
+      <button class="btn btn-pop w-100" :disabled="busy" @click="guest"><i class="bi bi-person-walking"></i> Continue as guest</button>
       <p class="tiny text-muted mt-2 mb-0">Guest data stays in this browser. Nothing is sent anywhere.</p>
+      </div>
     </div>
   </main>
 </template>
 
 <style scoped>
-.divider { display: flex; align-items: center; gap: 10px; color: var(--lq-muted); font-weight: 800; font-size: 0.8rem; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 2px; background: var(--lq-line); }
+.divider { display: flex; align-items: center; gap: 10px; color: var(--zt-muted); font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 2px; background: var(--zt-line); }
+.banner { height: 150px; background: var(--zt-yellow) url('/brand/zoot-passport.jpg') center 28% / cover no-repeat; border-bottom: var(--zt-bw) solid var(--zt-line); border-radius: calc(var(--zt-radius) - 3px) calc(var(--zt-radius) - 3px) 0 0; }
+.title { font-size: 2.4rem; }
 </style>

@@ -7,7 +7,7 @@ import { tick } from '../lib/clock.js'
 const ui = useUiStore()
 const hour = computed(() => ui.weather?.hours?.find((h) => tick.value >= h.ms && tick.value < h.ms + 3600000))
 const info = computed(() => {
-  if (ui.forceRain) return { icon: 'bi-cloud-rain-heavy', label: 'Heavy rain (dev)', prob: 90, temp: null }
+  if (ui.forceRain) return { icon: 'bi-cloud-rain-heavy-fill', label: 'Heavy rain (dev)', prob: 90, temp: null }
   if (!ui.weather) return null
   const d = describeCode(ui.weather.current.code)
   return { ...d, prob: hour.value?.prob ?? 0, temp: Math.round(ui.weather.current.temp) }
@@ -24,9 +24,9 @@ const wet = computed(() => info.value && info.value.prob > 60)
 </template>
 
 <style scoped>
-.wx { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; background: var(--lq-glass); backdrop-filter: blur(10px); font-weight: 800; font-size: 0.85rem; box-shadow: var(--lq-shadow); color: var(--lq-ink); }
-.wx .bi:first-child { font-size: 1.05rem; color: #f4a300; }
-.wx.wet { background: #2f7de1; color: #fff; }
-.wx.wet .bi:first-child { color: #fff; }
-.prob { opacity: 0.8; font-size: 0.78rem; }
+.wx { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; background: var(--zt-card); color: var(--zt-ink); border: var(--zt-bw) solid var(--zt-line); font-weight: 800; font-size: 0.8rem; box-shadow: var(--zt-shadow-sm); }
+.wx .bi:first-child { font-size: 1rem; }
+.wx.wet { background: #111; color: var(--zt-yellow); border-color: #111; box-shadow: 3px 3px 0 var(--zt-yellow); }
+[data-bs-theme='dark'] .wx.wet { border-color: var(--zt-yellow); }
+.prob { font-size: 0.74rem; display: inline-flex; align-items: center; gap: 2px; }
 </style>

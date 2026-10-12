@@ -31,7 +31,7 @@ const style = computed(() => STYLES[m.value?.style] || STYLES.budget)
 const leaveBy = computed(() => (m.value ? store.leaveBy() : null))
 
 const modeIcon = { walk: 'bi-person-walking', mrt: 'bi-train-front', taxi: 'bi-taxi-front' }
-const modePill = { walk: '', mrt: 'violet', taxi: 'sun' }
+const modePill = { walk: '', mrt: 'ink', taxi: 'pale' }
 
 /** Outdoor legs whose visit hour is forecast > 60% rain (or forced rain from /dev). */
 const wetLegs = computed(() => {
@@ -49,7 +49,7 @@ const replans = [
 </script>
 
 <template>
-  <main class="lq-page">
+  <main class="zt-page">
     <div v-if="!m" class="text-center py-5">
       <div v-if="store.status === 'planning'" class="spinner-border text-primary"></div>
       <template v-else>
@@ -64,18 +64,18 @@ const replans = [
       <header class="d-flex justify-content-between align-items-start gap-3 mb-3">
         <div>
           <div class="d-flex flex-wrap gap-2 mb-2">
-            <span class="lq-pill"><i class="bi" :class="style.icon"></i> {{ style.label }}</span>
-            <span v-if="m.source === 'groq'" class="lq-pill violet" :title="m.groq_model"><i class="bi bi-stars"></i> Picked by Groq</span>
-            <span v-else class="lq-pill sky" :title="m.fallback_reason || ''"><i class="bi bi-cpu"></i> Offline planner</span>
-            <span v-if="m.replans" class="lq-pill sun">Replanned ×{{ m.replans }}</span>
+            <span class="zt-pill"><i class="bi" :class="style.icon"></i> {{ style.label }}</span>
+            <span v-if="m.source === 'groq'" class="zt-pill ink" :title="m.groq_model"><i class="bi bi-stars"></i> Picked by Groq</span>
+            <span v-else class="zt-pill paper" :title="m.fallback_reason || ''"><i class="bi bi-cpu"></i> Offline planner</span>
+            <span v-if="m.replans" class="zt-pill pale">Replanned ×{{ m.replans }}</span>
           </div>
-          <h1 class="h3 mb-1">{{ m.title }}</h1>
+          <h1 class="title mb-1">{{ m.title }}</h1>
           <p class="text-muted small mb-0">From {{ m.origin.label }} · {{ store.stampedCount }}/{{ store.visitLegs.length }} stamped</p>
         </div>
         <TimeToGate :must-return-ms="store.mustReturnMs" :leave-by-ms="leaveBy?.ms" />
       </header>
 
-      <section class="lq-card p-3 mb-3">
+      <section class="zt-card p-3 mb-3">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <b class="small">Where your {{ fmtDuration(Math.round((store.mustReturnMs - Date.parse(m.start_iso)) / 60000)) }} goes</b>
           <WeatherChip />
@@ -92,7 +92,7 @@ const replans = [
           <b>Rain likely during {{ wetLegs.map((l) => l.name).join(', ') }}.</b>
           Swap outdoor stops for indoor ones nearby?
         </div>
-        <button class="btn btn-light btn-sm" :disabled="store.status === 'planning'" @click="store.replan('rain')">Indoor rewrite</button>
+        <button class="btn btn-sm" :disabled="store.status === 'planning'" @click="store.replan('rain')">Indoor rewrite</button>
       </div>
 
       <ol class="timeline list-unstyled">
@@ -102,7 +102,7 @@ const replans = [
         </li>
         <template v-for="leg in m.legs" :key="leg.seq + leg.place_id">
           <li class="tl-travel">
-            <span class="lq-pill" :class="modePill[leg.travel_mode]"><i class="bi" :class="modeIcon[leg.travel_mode]"></i> {{ leg.travel_min }} min</span>
+            <span class="zt-pill" :class="modePill[leg.travel_mode]"><i class="bi" :class="modeIcon[leg.travel_mode]"></i> {{ leg.travel_min }} min</span>
             <span class="tiny text-muted ms-2">{{ leg.travel_detail }}</span>
           </li>
           <li :class="['tl-stop', leg.kind, leg.status, { next: store.nextLeg === leg }]">
@@ -111,7 +111,7 @@ const replans = [
               <i v-else-if="leg.status === 'stamped'" class="bi bi-patch-check-fill"></i>
               <span v-else>{{ leg.seq }}</span>
             </div>
-            <div class="lq-card p-3 stop-card">
+            <div class="zt-card p-3 stop-card">
               <div class="d-flex justify-content-between gap-2">
                 <div>
                   <div class="tiny text-muted fw-800 mono">
@@ -124,14 +124,14 @@ const replans = [
                   </h2>
                 </div>
                 <div class="text-end">
-                  <span class="lq-pill coral text-nowrap">+{{ leg.xp }} XP</span>
-                  <div v-if="leg.kind === 'visit'" class="tiny mt-1" :class="leg.indoor ? 'text-muted' : 'text-warning-emphasis'">
+                  <span class="zt-pill pink text-nowrap">+{{ leg.xp }} XP</span>
+                  <div v-if="leg.kind === 'visit'" class="tiny mt-1" :class="leg.indoor ? 'text-muted' : 'fw-800'">
                     <i class="bi" :class="leg.indoor ? 'bi-house' : 'bi-sun'"></i> {{ leg.indoor ? 'Indoor' : 'Outdoor' }}
                   </div>
                 </div>
               </div>
               <p class="small mb-2 why">{{ leg.why }}</p>
-              <div v-if="leg.sidequest" class="lq-pill sun mb-2"><i class="bi bi-gem"></i> Sidequest</div>
+              <div v-if="leg.sidequest" class="zt-pill pale mb-2"><i class="bi bi-gem"></i> Sidequest</div>
               <div class="d-flex gap-2 flex-wrap" v-if="leg.kind === 'visit' && leg.status === 'pending'">
                 <RouterLink :to="`/map?focus=${leg.seq}`" class="btn btn-sm btn-soft"><i class="bi bi-geo"></i> On map</RouterLink>
                 <button class="btn btn-sm btn-link text-muted" @click="store.skip(leg)">Skip</button>
@@ -143,7 +143,7 @@ const replans = [
         </template>
       </ol>
 
-      <section class="lq-card p-3 mb-3">
+      <section class="zt-card p-3 mb-3">
         <div class="small fw-800 mb-2"><i class="bi bi-arrow-repeat"></i> Plans change. Rewrite the rest:</div>
         <div class="d-flex flex-wrap gap-2">
           <button v-for="r in replans" :key="r.mode" class="btn btn-soft btn-sm" :disabled="store.status === 'planning'" @click="store.replan(r.mode)">
@@ -154,27 +154,32 @@ const replans = [
       </section>
 
       <div class="play-bar">
-        <button class="btn btn-coral btn-lg w-100" @click="router.push('/map')"><i class="bi bi-controller"></i> Play on map</button>
+        <button class="btn btn-pop btn-lg w-100" @click="router.push('/map')"><i class="bi bi-controller"></i> Play on map</button>
       </div>
     </template>
   </main>
 </template>
 
 <style scoped>
+.title { font-size: clamp(1.7rem, 7vw, 2.4rem); }
 .timeline { position: relative; margin: 0 0 16px; }
-.timeline::before { content: ''; position: absolute; left: 17px; top: 8px; bottom: 8px; border-left: 3px dotted var(--lq-teal); opacity: 0.6; }
-.timeline li { position: relative; padding-left: 50px; }
-.tl-start { padding-bottom: 8px; display: flex; align-items: center; min-height: 36px; }
-.tl-travel { padding: 6px 0 6px 50px; }
-.tl-stop { padding-bottom: 4px; }
-.dot { position: absolute; left: 0; top: 10px; width: 37px; height: 37px; border-radius: 50%; background: var(--lq-teal); color: #fff; display: grid; place-items: center; font-weight: 800; font-family: 'Fredoka', sans-serif; border: 4px solid var(--lq-bg); z-index: 1; }
-.tl-start .dot { top: 0; background: var(--lq-sky); }
-.tl-stop.return .dot { background: var(--lq-sky); }
-.tl-stop.stamped .dot { background: #c0392b; }
-.tl-stop.skipped { opacity: 0.55; }
-.tl-stop.next .dot { background: var(--lq-coral); animation: lq-pulse 1.4s infinite; }
-.tl-stop.next .stop-card { border-color: var(--lq-coral); }
-.why { color: var(--lq-muted); }
-.rain-alert { background: linear-gradient(135deg, #2f7de1, #1f5fb3); color: #fff; border: none; border-radius: 18px; }
-.play-bar { position: sticky; bottom: calc(var(--lq-nav-h) + 20px); z-index: 5; }
+.timeline::before { content: ''; position: absolute; left: 18px; top: 8px; bottom: 8px; border-left: 3px dotted var(--zt-line); }
+.timeline li { position: relative; padding-left: 52px; }
+.tl-start { padding-bottom: 8px; display: flex; align-items: center; min-height: 40px; }
+.tl-travel { padding: 6px 0 6px 52px; }
+.tl-stop { padding-bottom: 6px; }
+.dot { position: absolute; left: 0; top: 10px; width: 39px; height: 39px; border-radius: 50%; background: var(--zt-yellow); color: #111; display: grid; place-items: center; font-weight: 700; font-family: var(--zt-font-head); border: var(--zt-bw) solid var(--zt-line); z-index: 1; }
+.tl-start .dot { top: 0; background: var(--zt-card); color: var(--zt-ink); }
+.tl-stop.return .dot { background: var(--zt-card); color: var(--zt-ink); }
+.tl-stop.stamped .dot { background: #111; color: var(--zt-yellow); border-color: #111; }
+[data-bs-theme='dark'] .tl-stop.stamped .dot { border-color: var(--zt-yellow); }
+.tl-stop.skipped { opacity: 0.5; }
+.tl-stop.next .dot { background: var(--zt-pink); animation: zt-pulse 1.4s infinite; }
+.tl-stop.next .stop-card { box-shadow: 5px 5px 0 var(--zt-pink); }
+.stop-card { box-shadow: var(--zt-shadow-sm); }
+.why { color: var(--zt-muted); }
+.rain-alert { background: #111; color: var(--zt-yellow); border: var(--zt-bw) solid #111; border-radius: 18px; box-shadow: 4px 4px 0 var(--zt-yellow); }
+[data-bs-theme='dark'] .rain-alert { border-color: var(--zt-yellow); }
+.rain-alert .btn { --bs-btn-bg: var(--zt-yellow); --bs-btn-color: #111; --bs-btn-border-color: var(--zt-yellow); }
+.play-bar { position: sticky; bottom: calc(var(--zt-nav-h) + 24px); z-index: 5; }
 </style>

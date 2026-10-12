@@ -54,21 +54,21 @@ async function grant() {
 }
 
 async function resetLocal() {
-  if (!confirm('Delete all LayQuest data stored in this browser (guest profile, missions, stamps)?')) return
+  if (!confirm('Delete all Zoot data stored in this browser (guest profile, missions, stamps)?')) return
   const db = await getDb()
   await db.resetAll?.()
-  ;['lq.pendingSlams', 'lq.seen', 'lq.activeMission', 'lq.bookmarks', 'lq.clockOffset', 'lq.forceRain', 'lq.fakeGps', 'lq.guest'].forEach((k) => localStorage.removeItem(k))
-  Object.keys(localStorage).filter((k) => k.startsWith('lq.summary.')).forEach((k) => localStorage.removeItem(k))
+  ;['zoot.pendingSlams', 'zoot.seen', 'zoot.activeMission', 'zoot.bookmarks', 'zoot.clockOffset', 'zoot.forceRain', 'zoot.fakeGps', 'zoot.guest'].forEach((k) => localStorage.removeItem(k))
+  Object.keys(localStorage).filter((k) => k.startsWith('zoot.summary.')).forEach((k) => localStorage.removeItem(k))
   location.href = '/'
 }
 </script>
 
 <template>
-  <main class="lq-page">
-    <h1 class="h3"><i class="bi bi-joystick"></i> Dev panel</h1>
+  <main class="zt-page">
+    <h1 style="font-size: 2.4rem"><i class="bi bi-joystick"></i> Dev panel</h1>
     <p class="text-muted small">Demo controls. Everything here is also reachable on the map with the joystick button.</p>
 
-    <section class="lq-card p-3 mb-3">
+    <section class="zt-card p-3 mb-3">
       <div class="d-flex justify-content-between align-items-center">
         <b>Fake GPS</b>
         <div class="form-check form-switch m-0">
@@ -83,13 +83,13 @@ async function resetLocal() {
       </div>
       <div class="d-flex gap-2 align-items-center mt-2 small">
         Walk speed
-        <button v-for="s in [1, 6, 20]" :key="s" class="lq-chip py-0 px-2" :class="{ active: geo.speed === s }" @click="geo.speed = s">{{ s }}×</button>
+        <button v-for="s in [1, 6, 20]" :key="s" class="zt-chip py-0 px-2" :class="{ active: geo.speed === s }" @click="geo.speed = s">{{ s }}×</button>
       </div>
       <p class="tiny text-muted mb-0 mt-2">On the map: WASD / arrow keys walk (Shift runs), tapping the ground walks there.</p>
     </section>
 
-    <section class="lq-card p-3 mb-3">
-      <b>Clock</b> <span class="mono ms-2">{{ clock }} SGT</span> <span v-if="clockOffsetMin()" class="lq-pill sun ms-1">+{{ clockOffsetMin() }} min</span>
+    <section class="zt-card p-3 mb-3">
+      <b>Clock</b> <span class="mono ms-2">{{ clock }} SGT</span> <span v-if="clockOffsetMin()" class="zt-pill pale ms-1">+{{ clockOffsetMin() }} min</span>
       <div class="d-flex flex-wrap gap-2 mt-2">
         <button class="btn btn-soft btn-sm" @click="skipMinutes(15)">Skip 15 min</button>
         <button class="btn btn-soft btn-sm" @click="skipMinutes(60)">Skip 1 h</button>
@@ -97,7 +97,7 @@ async function resetLocal() {
       </div>
     </section>
 
-    <section class="lq-card p-3 mb-3">
+    <section class="zt-card p-3 mb-3">
       <div class="d-flex justify-content-between align-items-center">
         <b>Force rain</b>
         <div class="form-check form-switch m-0">
@@ -108,19 +108,19 @@ async function resetLocal() {
       <button class="btn btn-soft btn-sm" :disabled="!store.mission" @click="store.replan('rain')">Run rain rewrite now</button>
     </section>
 
-    <section class="lq-card p-3 mb-3">
+    <section class="zt-card p-3 mb-3">
       <b>Stamps</b>
       <p class="tiny text-muted mb-2">Next: {{ next ? `${next.seq}. ${next.name}` : '—' }}</p>
       <div class="d-flex flex-wrap gap-2">
-        <button class="btn btn-coral btn-sm" :disabled="!next || next.kind !== 'visit'" @click="grant">Grant next stamp</button>
+        <button class="btn btn-pop btn-sm" :disabled="!next || next.kind !== 'visit'" @click="grant">Grant next stamp</button>
         <button class="btn btn-soft btn-sm" @click="router.push('/passport')">Open passport</button>
       </div>
     </section>
 
-    <section class="lq-card p-3 mb-3 small">
+    <section class="zt-card p-3 mb-3 small">
       <b>Environment</b>
       <ul class="mb-0 mt-2">
-        <li>Data: {{ user.mode === 'supabase' ? 'Supabase' : 'Guest (localStorage)' }}{{ HAS_SUPABASE ? '' : ' — no Supabase keys' }}</li>
+        <li>Data: {{ user.mode === 'supabase' ? 'Supabase' : 'Guest (localStorage)' }}{{ HAS_SUPABASE ? '' : ' (no Supabase keys)' }}</li>
         <li>Groq: {{ groq }}</li>
         <li>Weather: {{ ui.weather ? 'Open-Meteo OK' : ui.weatherError || 'not loaded' }}</li>
       </ul>
