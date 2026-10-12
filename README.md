@@ -1,6 +1,8 @@
-# LayQuest
+<p align="center"><img src="public/brand/zoot-wordmark.png" alt="Zoot" width="260" /></p>
 
-**Your layover, already quested.** LayQuest turns 6–14 spare hours in Singapore into a timed walking quest: the planner builds a schedule that fits the clock, a tilted 3D toy-city map makes it playable, and passport chops prove you were there.
+# Zoot
+
+**Short layover, just Zoot!** Zoot turns 6–14 spare hours in Singapore into a timed walking quest: the planner builds a schedule that fits the clock, a tilted 3D toy-city map makes it playable, and passport chops prove you were there.
 
 SMU IS216 · Section G3 · Group 4 · Vue 3 + Vite + Bootstrap 5 + Pinia + Supabase + Vercel + Groq, with MapLibre GL, Three.js and Turf.
 
@@ -29,7 +31,7 @@ Copy `.env.example` to `.env` locally, and add the same keys in Vercel → Proje
 
 `npm run dev` mounts the Vercel functions in `/api` through a small Vite plugin, so Groq works locally with the key in `.env`. `npm run preview` does not serve `/api`, so there the app uses the offline planner.
 
-## Grading-day demo script (Jackson)
+## Grading-day demo script (Sonion's layover)
 
 1. Open the Vercel URL on a phone → **Start a layover** → **Continue as guest** (or use the email magic link) → quiz → *Budget*.
 2. `/plan`: **Changi T3**, **8 h**, interests **Hawker · Gardens · Photo** → **Build my quest**.
@@ -46,13 +48,13 @@ Copy `.env.example` to `.env` locally, and add the same keys in Vercel → Proje
 ```
 /plan form ─► computeBudget()  exit 30 · re-entry 45 · safety 45 (airport) / 20 (hotel)
           ─► buildCandidates() interests, window size, indoor/rain, exclusions
-          ─► Groq (/api/plan)  picks 3–6 place_ids + "why" copy   ← layquest.choice.v1
+          ─► Groq (/api/plan)  picks 3–6 place_ids + "why" copy   ← zoot.choice.v1
                │ validateChoice() → retry once → else ↓
                ▼
           ─► deterministic planner: Turf radius clusters (1.2 km) → greedy nearest-neighbour
              with variety + time budget → MRT when walk > 18 min (static graph, transfer
              penalty, closes 23:30) → mandatory "Return to origin" leg
-          ─► validateMission()                                    ← layquest.mission.v1
+          ─► validateMission()                                    ← zoot.mission.v1
 ```
 
 - **Groq never produces minutes or coordinates.** It returns ids and copy; `sequencePicks()` times every leg with Turf and the MRT graph. Ids outside the catalog slice, extra fields such as `travel_min`, or a wrong schema are all rejected (`src/lib/itinerarySchema.js`).
@@ -61,16 +63,17 @@ Copy `.env.example` to `.env` locally, and add the same keys in Vercel → Proje
 
 ## Project structure and team lanes
 
-| Member | Lane | Files |
+| Member | Role (from the pitch deck) | Main files |
 | --- | --- | --- |
-| Kayra Zalfa Alimaa | Supabase schema, seed, `stamp_place` RPC, RLS, Groq route | `supabase/`, `scripts/gen-seed.mjs`, `api/`, `src/lib/db/remote.js`, `src/lib/planner.js` |
-| Nathanael Steven Chiang | Auth, guards, profiles, onboarding | `src/stores/user.js`, `src/router/`, `src/views/AuthView.vue`, `OnboardView.vue` |
-| Ganaden Matt Eudale Corpuz | Bootstrap views, landing, planner form, place page | `src/views/LandingView.vue`, `PlanView.vue`, `PlaceView.vue`, `MissionView.vue`, `src/components/` |
-| Shrey Chauhan | 3D map, avatar, quest path, passport | `src/map/`, `src/gl/`, `src/views/MapView.vue`, `PassportView.vue` |
-| Matthew Tjandera | Vercel, env, CI preview, design QA, dark mode, PWA | `vercel.json`, `vite.config.js`, `.env.example`, `src/styles/app.css`, `public/manifest.webmanifest` |
-| Hulbert Koh Ming Ren | Weather, advisories, place content + Groq summaries, sidequests | `src/lib/weather.js`, `src/data/`, `api/summary.js`, `src/views/SwipeView.vue` |
+| Matthew | 3D quest map, geofenced check-ins, hosting | `src/map/`, `src/gl/worldLayer.js`, `avatar.js`, `markers.js`, `src/views/MapView.vue`, `src/lib/geo.js`, `checkin.js`, `vercel.json` |
+| Steven | Profile, authentication and verification | `src/stores/user.js`, `src/router/`, `src/lib/db/`, `src/views/AuthView.vue`, `OnboardView.vue`, `ProfileView.vue` |
+| Shrey | Interactive 3D passport and customisation | `src/gl/passportScene.js`, `pageArt.js`, `src/views/PassportView.vue`, `CodexView.vue`, `src/lib/brand.js` |
+| Kayra | Route optimiser and itinerary engine | `src/lib/planner.js`, `travel.js`, `itinerarySchema.js`, `groq.js`, `api/plan.js`, `src/views/PlanView.vue`, `MissionView.vue`, `supabase/` |
+| Eudale | Clans, social quests and messaging | `src/views/PartyView.vue` (stub), `SwipeView.vue`, `src/stores/party.js`, the `parties` / `messages` tables |
+| Hulbert | Weather and danger risk system | `src/lib/weather.js`, `src/components/WeatherChip.vue`, the rain rewrite, `advisories` table, `api/summary.js` |
 
 ```
+public/brand/        Zoot wordmark, otter badge icons and the two mascot illustrations from the pitch deck
 api/                 Vercel functions: plan.js (Groq chooser), summary.js (place blurb), _lib/groq.js
 scripts/             gen-seed.mjs (→ supabase/seed.sql), test-planner.mjs
 supabase/            schema.sql (tables, RLS, RPCs), seed.sql (generated)
@@ -80,8 +83,25 @@ src/lib/             planner, travel (Turf + MRT graph), hours, itinerarySchema,
 src/stores/          user, trip, mission, passport, ui, party   (Pinia)
 src/map/             MapLibre style, QuestMap component, quest path / geofence layers
 src/gl/              Three.js: avatar, markers, worldLayer (custom layer), passport book, page art
+src/styles/app.css   the Zoot design system (tokens, buttons, pills, cards, dark mode)
 src/views/           one view per route in the IA table
 ```
+
+## Brand
+
+The look comes from the Zoot pitch deck: taxi yellow, ink black, a hot-pink accent, thick outlines and hard "sticker" shadows.
+
+| Token | Value | Used for |
+| --- | --- | --- |
+| Yellow | `#FFCC00` | Primary buttons, pills, selected states, tall buildings on the map |
+| Soft / pale yellow | `#FFE680` / `#FFF4C2` | Bands, hover states, page tint |
+| Ink | `#111111` | Text, outlines, the time-to-gate board |
+| Pink | `#F83878` | The walking path, the next stop, the Stamp button, the traveller's scarf |
+| Orange-red | `#FF4D00` | Urgency: the red countdown state, taxi legs, errors |
+
+Type: Bebas Neue for display headings, Fredoka for headings and the wordmark feel, Poppins for body text (all Google Fonts).
+
+Where to change things: CSS tokens live at the top of `src/styles/app.css` (light and dark), colours used by canvas and WebGL code live in `src/lib/brand.js`, the map palette is in `src/map/style.js`, and the quest path colours are in `src/map/questLayers.js`.
 
 ## Supabase setup (about 5 minutes)
 
@@ -122,6 +142,7 @@ Import the repo into Vercel (the framework is detected as Vite; `vercel.json` ad
 - Place art is procedural. Add real photos through `places.image_url` (with licences you're allowed to use).
 - Travel times come from a simplified MRT graph with average waits, not live transit data. Taxi times are distance-based estimates.
 - The Supabase adapter was checked against a local Postgres with a stubbed `auth` schema (schema, seed, RPC rules, RLS, XP guard), but not yet against a live Supabase project.
+- The wordmark, otter badge and the two mascot illustrations in `public/brand/` were exported from the team's pitch deck. Check that the licence of whatever tool made them covers publishing them in a public repo.
 - No Pokémon names, assets or trademarks appear in the UI or repo. The GO-style feel comes from original low-poly meshes and styling.
 
 ## Credits
