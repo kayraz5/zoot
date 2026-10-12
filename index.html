@@ -3,19 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#12b3a8" />
-    <meta name="description" content="LayQuest turns a layover into a timed 3D walking quest — planned to the clock, played on the street." />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#ffcc00" />
+    <meta name="description" content="Short layover, just Zoot! A timed 3D walking quest across Singapore that always gets you back to the gate." />
+    <link rel="icon" type="image/png" href="/brand/favicon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/brand/zoot-badge-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
-    <title>LayQuest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fredoka:wght@500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>Zoot</title>
     <script>
-      // Apply the saved theme before first paint to avoid a flash.
       try {
-        var t = localStorage.getItem('lq.theme')
+        // One-time move of data saved under the old "lq." prefix, so nobody loses stamps in the rebrand.
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+          var k = localStorage.key(i)
+          if (k && k.indexOf('lq.') === 0) {
+            var nk = 'zoot.' + k.slice(3)
+            if (localStorage.getItem(nk) === null) localStorage.setItem(nk, localStorage.getItem(k))
+            localStorage.removeItem(k)
+          }
+        }
+        // Apply the saved theme before first paint to avoid a flash.
+        var t = localStorage.getItem('zoot.theme')
         if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
         document.documentElement.setAttribute('data-bs-theme', t)
       } catch (e) {}
