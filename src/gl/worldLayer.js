@@ -1,18 +1,19 @@
 import * as THREE from 'three'
 import { MercatorCoordinate } from 'maplibre-gl'
-import { createTraveller, createGhost } from './avatar.js'
+import { createTraveller, createGhost, AVATAR } from './avatar.js'
 import { createTotem, createSeal, createToken, createGate } from './markers.js'
 
 /**
- * MapLibre custom layer that renders the Three.js world (Shrey's lane):
+ * MapLibre custom layer that renders the Three.js world (Matthew's lane):
  * avatar, stamp totems, chopped seals, sidequest tokens and the home gate.
  *
  * Scene axes: x = east (m), y = up (m), z = south (m), relative to `origin`.
  * Objects are scaled with zoom so they keep a readable, game-like screen size.
  */
 export class WorldLayer {
-  constructor(origin) {
-    this.id = 'lq-world'
+  constructor(origin, { dark = false } = {}) {
+    this.dark = dark
+    this.id = 'zt-world'
     this.type = 'custom'
     this.renderingMode = '3d'
     this.origin = origin
@@ -29,7 +30,7 @@ export class WorldLayer {
     this.camera = new THREE.Camera()
     this.scene = new THREE.Scene()
 
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x9cc7a4, 2.2)
+    const hemi = new THREE.HemisphereLight(0xffffff, 0xffe9a0, 2.2)
     const sun = new THREE.DirectionalLight(0xffffff, 1.9)
     sun.position.set(-40, 100, 60)
     this.scene.add(hemi, sun)
@@ -42,7 +43,8 @@ export class WorldLayer {
       .scale(new THREE.Vector3(this.unit, -this.unit, this.unit))
       .multiply(new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2))
 
-    this.avatar = createTraveller()
+    // On the night map a black jacket vanishes, so the traveller wears charcoal there.
+    this.avatar = createTraveller(this.dark ? { ...AVATAR, jacket: 0x4d4d4d, pants: 0x5c5c5c, hair: 0x353535 } : AVATAR)
     this.ghost = createGhost(this.avatar)
     this.avatar.traverse((o) => { if (o.isMesh) o.renderOrder = 2 })
     this.avatarRig = new THREE.Group()

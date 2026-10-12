@@ -10,7 +10,7 @@ import { radiusFor } from '../lib/checkin.js'
 import { CITY } from '../lib/config.js'
 
 /**
- * The 3D overworld (Shrey's lane). MapLibre draws the pastel city + quest path,
+ * The 3D overworld (Matthew's lane). MapLibre draws the pastel city + quest path,
  * WorldLayer (Three.js) draws the traveller and stamp totems in the same GL context.
  */
 const props = defineProps({
@@ -68,7 +68,7 @@ onMounted(() => {
     emit('fatal', err)
     return
   }
-  if (import.meta.env.DEV) window.__lqMap = map
+  if (import.meta.env.DEV) window.__zootMap = map
   map.scrollZoom.enable({ around: 'center' })
   map.touchZoomRotate.enable({ around: 'center' })
   map.on('style.load', setupLayers)
@@ -92,22 +92,22 @@ onBeforeUnmount(() => {
   world = null
 })
 
-/** Push the follow point below centre so the traveller sees the street ahead (GO-style). */
+/** Keep the traveller in the clear band between the top HUD and the next-stop card. */
 function applyPadding() {
   if (!map) return
   const h = map.getContainer().clientHeight
-  map.setPadding({ top: Math.round(h * 0.1), bottom: 0, left: 0, right: 0 })
+  map.setPadding({ top: Math.round(h * 0.06), bottom: Math.round(h * 0.32), left: 0, right: 0 })
 }
 
 function setupLayers() {
-  addQuestLayers(map)
+  addQuestLayers(map, { dark: props.dark })
   map.addLayer({
-    id: 'lq-stops-2d', type: 'circle', source: 'lq-labels',
-    paint: { 'circle-radius': 9, 'circle-color': '#12b3a8', 'circle-stroke-color': '#fff', 'circle-stroke-width': 3, 'circle-opacity': flat.value ? 1 : 0, 'circle-stroke-opacity': flat.value ? 1 : 0 }
-  }, 'lq-labels')
+    id: 'zt-stops-2d', type: 'circle', source: 'zt-labels',
+    paint: { 'circle-radius': 9, 'circle-color': '#ffcc00', 'circle-stroke-color': '#111111', 'circle-stroke-width': 3, 'circle-opacity': flat.value ? 1 : 0, 'circle-stroke-opacity': flat.value ? 1 : 0 }
+  }, 'zt-labels')
   try {
     if (flat.value) throw new Error('flat mode')
-    world = new WorldLayer(worldOrigin())
+    world = new WorldLayer(worldOrigin(), { dark: props.dark })
     map.addLayer(world)
   } catch (err) {
     goFlat(err)
@@ -121,8 +121,8 @@ function goFlat(err) {
   flat.value = true
   world = null
   map.setPitch(0)
-  map.setPaintProperty('lq-stops-2d', 'circle-opacity', 1)
-  map.setPaintProperty('lq-stops-2d', 'circle-stroke-opacity', 1)
+  map.setPaintProperty('zt-stops-2d', 'circle-opacity', 1)
+  map.setPaintProperty('zt-stops-2d', 'circle-stroke-opacity', 1)
   if (!emoji) {
     const node = document.createElement('div')
     node.className = 'emoji-avatar'
@@ -138,12 +138,12 @@ function legStatus(l) {
 }
 
 function syncMission() {
-  if (!map?.getSource('lq-labels')) return
+  if (!map?.getSource('zt-labels')) return
   const m = props.mission
-  map.getSource('lq-labels').setData(labelsGeoJSON(m))
+  map.getSource('zt-labels').setData(labelsGeoJSON(m))
   const next = props.nextLeg
-  map.getSource('lq-fence').setData(next && next.kind === 'visit' ? fenceGeoJSON(next, radiusFor(geo.accuracy ?? 10)) : fenceGeoJSON(null))
-  map.getSource('lq-route').setData(routeGeoJSON(m, display))
+  map.getSource('zt-fence').setData(next && next.kind === 'visit' ? fenceGeoJSON(next, radiusFor(geo.accuracy ?? 10)) : fenceGeoJSON(null))
+  map.getSource('zt-route').setData(routeGeoJSON(m, display))
   world?.setStops((m?.legs || []).filter((l) => l.status !== 'skipped').map((l) => ({ key: `${l.seq}-${l.place_id}`, lng: l.lng, lat: l.lat, status: legStatus(l) })))
 }
 
@@ -202,14 +202,14 @@ function loop(t) {
     if (following) map.jumpTo({ center: [display.lng, display.lat] })
   }
 
-  if (t - lastRoute > 250 && map.getSource('lq-route')) {
+  if (t - lastRoute > 250 && map.getSource('zt-route')) {
     lastRoute = t
-    map.getSource('lq-route').setData(routeGeoJSON(props.mission, display))
+    map.getSource('zt-route').setData(routeGeoJSON(props.mission, display))
   }
-  if (t - lastDash > 70 && map.getLayer('lq-route')) {
+  if (t - lastDash > 70 && map.getLayer('zt-route')) {
     lastDash = t
     dashStep = (dashStep + 1) % DASH_SEQUENCE.length
-    map.setPaintProperty('lq-route', 'line-dasharray', DASH_SEQUENCE[dashStep])
+    map.setPaintProperty('zt-route', 'line-dasharray', DASH_SEQUENCE[dashStep])
   }
 }
 
@@ -275,5 +275,5 @@ defineExpose({
 .quest-map { position: absolute; inset: 0; }
 .quest-map :deep(.emoji-avatar) { font-size: 34px; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.3)); }
 .quest-map :deep(.maplibregl-ctrl-attrib) { font-size: 10px; }
-.quest-map :deep(.maplibregl-ctrl-bottom-right) { bottom: calc(var(--lq-nav-h) + 16px); }
+.quest-map :deep(.maplibregl-ctrl-bottom-right) { bottom: calc(var(--zt-nav-h) + 16px); }
 </style>

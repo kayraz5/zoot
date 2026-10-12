@@ -7,42 +7,48 @@ import { travel } from '../lib/travel.js'
  * the dotted quest path (by travel mode), the check-in geofence and stop labels.
  */
 const EMPTY = { type: 'FeatureCollection', features: [] }
-const MODE_COLOR = { walk: '#ff6b5b', mrt: '#8e6bff', taxi: '#f4a300' }
+// Walk = pink dots, MRT = ink (yellow at night), taxi = orange. The casing keeps them readable on any ground.
+const THEME = {
+  day: { walk: '#f83878', mrt: '#111111', taxi: '#ff4d00', casing: '#ffffff', label: '#111111', halo: '#ffffff' },
+  night: { walk: '#f83878', mrt: '#ffcc00', taxi: '#ff4d00', casing: '#000000', label: '#fff4c2', halo: '#111111' }
+}
+export const FENCE_COLOR = '#f83878'
 
 export const DASH_SEQUENCE = [
   [0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5], [2, 4, 1], [2.5, 4, 0.5], [3, 4, 0],
   [0, 0.5, 3, 3.5], [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2], [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5]
 ]
 
-export function addQuestLayers(map, beforeId) {
-  map.addSource('lq-route', { type: 'geojson', data: EMPTY })
-  map.addSource('lq-fence', { type: 'geojson', data: EMPTY })
-  map.addSource('lq-labels', { type: 'geojson', data: EMPTY })
+export function addQuestLayers(map, { dark = false, beforeId } = {}) {
+  const c = dark ? THEME.night : THEME.day
+  map.addSource('zt-route', { type: 'geojson', data: EMPTY })
+  map.addSource('zt-fence', { type: 'geojson', data: EMPTY })
+  map.addSource('zt-labels', { type: 'geojson', data: EMPTY })
 
-  map.addLayer({ id: 'lq-fence-fill', type: 'fill', source: 'lq-fence', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.16 } }, beforeId)
-  map.addLayer({ id: 'lq-fence-line', type: 'line', source: 'lq-fence', paint: { 'line-color': ['get', 'color'], 'line-width': 2.5, 'line-dasharray': [2, 1.5] } }, beforeId)
+  map.addLayer({ id: 'zt-fence-fill', type: 'fill', source: 'zt-fence', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.2 } }, beforeId)
+  map.addLayer({ id: 'zt-fence-line', type: 'line', source: 'zt-fence', paint: { 'line-color': ['get', 'color'], 'line-width': 3, 'line-dasharray': [2, 1.5] } }, beforeId)
   map.addLayer({
-    id: 'lq-route-casing', type: 'line', source: 'lq-route',
+    id: 'zt-route-casing', type: 'line', source: 'zt-route',
     layout: { 'line-cap': 'round', 'line-join': 'round' },
-    paint: { 'line-color': '#ffffff', 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 4, 17, 12], 'line-opacity': ['case', ['get', 'active'], 0.95, 0.55] }
+    paint: { 'line-color': c.casing, 'line-width': ['interpolate', ['linear'], ['zoom'], 12, 4.5, 17, 13], 'line-opacity': ['case', ['get', 'active'], 1, 0.6] }
   }, beforeId)
   map.addLayer({
-    id: 'lq-route', type: 'line', source: 'lq-route',
+    id: 'zt-route', type: 'line', source: 'zt-route',
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     paint: {
-      'line-color': ['match', ['get', 'mode'], 'mrt', MODE_COLOR.mrt, 'taxi', MODE_COLOR.taxi, MODE_COLOR.walk],
+      'line-color': ['match', ['get', 'mode'], 'mrt', c.mrt, 'taxi', c.taxi, c.walk],
       'line-width': ['interpolate', ['linear'], ['zoom'], 12, 2.5, 17, 7],
-      'line-opacity': ['case', ['get', 'active'], 1, 0.55],
+      'line-opacity': ['case', ['get', 'active'], 1, 0.7],
       'line-dasharray': DASH_SEQUENCE[0]
     }
   }, beforeId)
   map.addLayer({
-    id: 'lq-labels', type: 'symbol', source: 'lq-labels', minzoom: 13.5,
+    id: 'zt-labels', type: 'symbol', source: 'zt-labels', minzoom: 13.5,
     layout: {
       'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 12,
       'text-anchor': 'top', 'text-offset': [0, 1.2], 'text-max-width': 10, 'text-allow-overlap': false
     },
-    paint: { 'text-color': '#15313a', 'text-halo-color': '#ffffff', 'text-halo-width': 2 }
+    paint: { 'text-color': c.label, 'text-halo-color': c.halo, 'text-halo-width': 2.2 }
   })
 }
 
@@ -70,7 +76,7 @@ export function routeGeoJSON(mission, here) {
   return { type: 'FeatureCollection', features }
 }
 
-export function fenceGeoJSON(leg, radiusM, color = '#ff6b5b') {
+export function fenceGeoJSON(leg, radiusM, color = FENCE_COLOR) {
   if (!leg) return EMPTY
   const c = circle(point([leg.lng, leg.lat]), radiusM / 1000, { steps: 48, units: 'kilometers' })
   c.properties = { color }

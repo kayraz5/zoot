@@ -1,25 +1,27 @@
 /**
- * Pastel "toy diorama" MapLibre style on OpenFreeMap vector tiles (OpenMapTiles schema).
- * Free, no key. Shrey's lane: tweak colours here, not in components.
+ * Zoot "toy diorama" MapLibre style on OpenFreeMap vector tiles (OpenMapTiles schema).
+ * Free, no key. Matthew's lane: tweak colours here, not in components.
  */
 const PALETTES = {
+  // Zoot day: cream ground, white-to-yellow buildings (taller = more yellow), ink-outlined roads.
   day: {
-    ground: '#e4f3dc', residential: '#e9f1dc', commercial: '#f2ecdf', industrial: '#e6e8e2',
-    grass: '#bfe6a6', wood: '#a3d98c', sand: '#fbe6ae', park: '#b6e39c',
-    water: '#77cfee', waterLine: '#a7e6fa', aeroway: '#d9e3ea', runway: '#c9d4dc',
-    roadMajor: '#fffdf4', roadMinor: '#ffffff', roadCasing: '#c7dcc0', path: '#f3c98d', rail: '#b9b2c9',
-    b0: '#fff6ea', b1: '#ffe8d2', b2: '#f5dbff', b3: '#dbe5ff', bOpacity: 0.82,
-    label: '#3e5963', labelHalo: '#ffffff',
-    sky: { 'sky-color': '#8fd6ff', 'horizon-color': '#e8f7ff', 'fog-color': '#e8f7ff', 'sky-horizon-blend': 0.6, 'horizon-fog-blend': 0.6, 'fog-ground-blend': 0.25, 'atmosphere-blend': 0.2 }
+    ground: '#fff6cf', residential: '#fff3c4', commercial: '#ffefb3', industrial: '#f3ecd0',
+    grass: '#dfe9a6', wood: '#cbdd8e', sand: '#ffe9a8', park: '#d7e79c',
+    water: '#9fdcf0', waterLine: '#d3f1fa', aeroway: '#efe8cb', runway: '#dcd3ab',
+    roadMajor: '#ffffff', roadMinor: '#ffffff', roadCasing: '#3a3526', path: '#d9b84a', rail: '#111111',
+    b0: '#ffffff', b1: '#fff4c2', b2: '#ffe680', b3: '#ffcc00', bOpacity: 0.9,
+    label: '#111111', labelHalo: '#ffffff',
+    sky: { 'sky-color': '#ffe680', 'horizon-color': '#fff4c2', 'fog-color': '#fff4c2', 'sky-horizon-blend': 0.6, 'horizon-fog-blend': 0.6, 'fog-ground-blend': 0.25, 'atmosphere-blend': 0.2 }
   },
+  // Zoot night: black city, yellow arterials and lit-up towers.
   night: {
-    ground: '#172a35', residential: '#1b2f3a', commercial: '#20313d', industrial: '#1c2a33',
-    grass: '#1f4034', wood: '#1a3a2d', sand: '#3a3a2c', park: '#21453a',
-    water: '#1d5d86', waterLine: '#2c7fb0', aeroway: '#223543', runway: '#2b4152',
-    roadMajor: '#7a92b8', roadMinor: '#4a6082', roadCasing: '#10202a', path: '#8d6f4c', rail: '#5a5470',
-    b0: '#2c4063', b1: '#3a4d80', b2: '#4f4a8f', b3: '#5f58a8', bOpacity: 0.8,
-    label: '#cfe3ff', labelHalo: '#0e1a20',
-    sky: { 'sky-color': '#0b1630', 'horizon-color': '#27406b', 'fog-color': '#1a2c48', 'sky-horizon-blend': 0.6, 'horizon-fog-blend': 0.6, 'fog-ground-blend': 0.3, 'atmosphere-blend': 0.15 }
+    ground: '#151515', residential: '#191919', commercial: '#1d1d1d', industrial: '#171717',
+    grass: '#1f2a14', wood: '#1a2511', sand: '#2a2614', park: '#222e16',
+    water: '#0c2b3b', waterLine: '#14506b', aeroway: '#202020', runway: '#303030',
+    roadMajor: '#d9ad00', roadMinor: '#3d3d3d', roadCasing: '#000000', path: '#5a4c14', rail: '#8c8c8c',
+    b0: '#2b2b2b', b1: '#3a3a3a', b2: '#6a5a10', b3: '#ffcc00', bOpacity: 0.9,
+    label: '#fff4c2', labelHalo: '#111111',
+    sky: { 'sky-color': '#0a0a0a', 'horizon-color': '#3a3000', 'fog-color': '#1a1600', 'sky-horizon-blend': 0.6, 'horizon-fog-blend': 0.6, 'fog-ground-blend': 0.3, 'atmosphere-blend': 0.15 }
   }
 }
 
@@ -29,7 +31,7 @@ export function questStyle({ dark = false } = {}) {
   const c = dark ? PALETTES.night : PALETTES.day
   return {
     version: 8,
-    name: 'LayQuest Toy City',
+    name: 'Zoot Toy City',
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     sources: {
       omt: { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: '© OpenStreetMap contributors · OpenFreeMap' }
